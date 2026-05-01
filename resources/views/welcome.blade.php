@@ -535,7 +535,12 @@
 </head>
 
 <body>
+    @guest
+        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+    @endguest
+    @auth
     <H3> Welcome {{ auth()->user()->name }}</h1>
+    @endauth
     <div class="shell">
 
         {{-- ── Header ── --}}
