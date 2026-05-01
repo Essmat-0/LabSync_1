@@ -11,25 +11,15 @@ use Laravel\Fortify\Features;
 
 Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+
 
 Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+    Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:1')->name('admin.dashboard');
 
-    Route::get('settings/profile', Profile::class)->name('profile.edit');
-    Route::get('settings/password', Password::class)->name('user-password.edit');
-    Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
+    Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:4')->name('labmanager.dashboard');
 
-    Route::get('settings/two-factor', TwoFactor::class)
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
+    Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:2')->name('pi.dashboard');
+
+    Route::get('/auditor/dashboard', fn() => view('dashboards.auditor'))->middleware('role:null')->name('auditor.dashboard');
 });
+Route::get('/', [EquipmentController::class, 'index'])->name('researcher.dashboard');

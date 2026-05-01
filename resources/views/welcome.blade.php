@@ -535,7 +535,7 @@
 </head>
 
 <body>
-
+    <H3> Welcome {{ auth()->user()->name }}</h1>
     <div class="shell">
 
         {{-- ── Header ── --}}
@@ -658,13 +658,13 @@
 
                     {{-- Footer actions --}}
                     <div class="card-footer">
-                        <a href="{{ route('equipment.index', $item->id) }}" class="btn btn-ghost">
+                        <a href="{{ route('researcher.dashboard', $item->id) }}" class="btn btn-ghost">
                             View Details
                         </a>
 
                         @auth
                             @if ($canBook)
-                                <a href="{{ route('equipment.book', $item->id) }}" class="btn btn-primary">
+                                <a href="{{ route('researcher.dashboard', $item->id) }}" class="btn btn-primary">
                                     Book Session
                                 </a>
                             @else

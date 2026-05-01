@@ -11,48 +11,83 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    // ---------------------------------------------------------------------------
+    // Role Constants
+    // ---------------------------------------------------------------------------
+    const ROLE_RESEARCHER    = 3;
+    const ROLE_LAB_MANAGER   = 4;
+    const ROLE_AUDITOR       = 5;
+    const ROLE_SYSTEM_ADMIN  = 1;
+    const ROLE_PI            = 2;
+
+    // ---------------------------------------------------------------------------
+    // Fillable / Hidden
+    // ---------------------------------------------------------------------------
     protected $fillable = [
+        'user_id',
         'name',
-        'email',
-        'password',
+        'email_address',
+        'password_hash',
+        'role',
+        'user_role_tier',
+        'security_clearance_level',
+        'is_active',
+        'expiry_date',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
+        'password_hash',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'is_active'    => 'boolean',
+        'expiry_date'  => 'date',
+    ];
+
+    // ---------------------------------------------------------------------------
+    // Auth override: Laravel expects "password" column by default
+    // ---------------------------------------------------------------------------
+    public function getAuthPassword(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->password;
     }
 
-    /**
-     * Get the user's initials
-     */
+    // ---------------------------------------------------------------------------
+    // Role Helper Methods
+    // ---------------------------------------------------------------------------
+    public function isResearcher(): bool
+    {
+        return $this->role === self::ROLE_RESEARCHER;
+    }
+
+    public function isLabManager(): bool
+    {
+        return $this->role === self::ROLE_LAB_MANAGER;
+    }
+
+    public function isAuditor(): bool
+    {
+        return $this->role === self::ROLE_AUDITOR;
+    }
+
+    public function isSystemAdmin(): bool
+    {
+        return $this->role === self::ROLE_SYSTEM_ADMIN;
+    }
+
+    public function isPI(): bool
+    {
+        return $this->role === self::ROLE_PI;
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
     public function initials(): string
     {
         return Str::of($this->name)
