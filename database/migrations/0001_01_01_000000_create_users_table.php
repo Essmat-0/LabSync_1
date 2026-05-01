@@ -11,13 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 50)->unique();
+            $table->timestamps();
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('name', 100);
+            $table->string('email', 100)->unique();
+            $table->string('password'); // Laravel handles length automatically (default 255)
+            $table->integer('clearance_level')->default(0);
+            $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+            $table->rememberToken(); // Best practice for auth
             $table->timestamps();
         });
 
