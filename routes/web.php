@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EquipmentController;
+use App\Livewire\Actions\Logout;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -13,11 +14,11 @@ use Laravel\Fortify\Features;
 Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
 
 
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:1')->name('admin.dashboard');
 
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:4')->name('labmanager.dashboard');
+    Route::get('/researcher/dashboard', fn() => view('dashboards.researcher'))->middleware('role:4')->name('researcher.dashboard');
 
     Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:2')->name('pi.dashboard');
 
@@ -27,4 +28,5 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:1'])->group(function () {
     Route::post('/adminAddUser', [AdminController::class, 'store'])->name('admin.users.store');
     Route::delete('/adminDeleteUser', [AdminController::class, 'destroy'])->name('admin.users.destroy');
+    Route::post('/logout', [Logout::class, '__invoke'])->name('logout');
 });
