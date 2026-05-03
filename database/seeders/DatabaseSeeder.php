@@ -18,14 +18,15 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Admin',      'created_at' => now(), 'updated_at' => now()],
             ['name' => 'PI',         'created_at' => now(), 'updated_at' => now()], // Principal Investigator
             ['name' => 'Researcher', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Technician', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Lab_Manager', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Auditor', 'created_at' => now(), 'updated_at' => now()],
         ];
         DB::table('roles')->insert($roles);
 
         $adminRoleId      = DB::table('roles')->where('name', 'Admin')->value('id');
         $piRoleId         = DB::table('roles')->where('name', 'PI')->value('id');
         $researcherRoleId = DB::table('roles')->where('name', 'Researcher')->value('id');
-        $techRoleId       = DB::table('roles')->where('name', 'Technician')->value('id');
+        $LabManagerRoleId = DB::table('roles')->where('name', 'Lab_Manager')->value('id');
 
         // ──────────────────────────────────────────
         // 2. USERS  (5 rows)
@@ -108,7 +109,7 @@ class DatabaseSeeder extends Seeder
                 'email'                => 'ntorres@lab.edu',
                 'password'             => Hash::make('password'),
                 'clearance_level'      => 2,
-                'role_id'              => $techRoleId,
+                'role_id'              => $LabManagerRoleId,
                 'is_active'            => true,
                 'expiry_date'          => '2026-11-15',
                 'academicLevel'        => 'BSc',

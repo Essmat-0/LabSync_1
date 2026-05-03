@@ -26,11 +26,13 @@ class User extends Authenticatable
     // Fillable / Hidden
     // ---------------------------------------------------------------------------
     protected $fillable = [
-        'user_id',
+        'id',
         'name',
-        'email_address',
-        'password_hash',
-        'role',
+        'email',
+        'password',
+        'role_id',
+        'budget_limit',
+        'managed_Lab_Locations',
         'user_role_tier',
         'security_clearance_level',
         'is_active',
@@ -38,7 +40,7 @@ class User extends Authenticatable
     ];
 
     protected $hidden = [
-        'password_hash',
+        'password',
         'remember_token',
     ];
 
@@ -46,14 +48,6 @@ class User extends Authenticatable
         'is_active'    => 'boolean',
         'expiry_date'  => 'date',
     ];
-
-    // ---------------------------------------------------------------------------
-    // Auth override: Laravel expects "password" column by default
-    // ---------------------------------------------------------------------------
-    public function getAuthPassword(): string
-    {
-        return $this->password;
-    }
 
     // ---------------------------------------------------------------------------
     // Role Helper Methods
@@ -93,7 +87,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 }

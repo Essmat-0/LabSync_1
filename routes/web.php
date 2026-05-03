@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EquipmentController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -22,4 +23,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/auditor/dashboard', fn() => view('dashboards.auditor'))->middleware('role:null')->name('auditor.dashboard');
 });
-Route::get('/', [EquipmentController::class, 'index'])->name('researcher.dashboard');
+
+Route::middleware(['auth', 'role:1'])->group(function () {
+    Route::post('/adminAddUser', [AdminController::class, 'store'])->name('admin.users.store');
+    Route::delete('/adminDeleteUser', [AdminController::class, 'destroy'])->name('admin.users.destroy');
+});
