@@ -234,7 +234,7 @@
             </div>
 
             {{-- RESTORED YOUR ORIGINAL COMPONENT --}}
-            <x-logout-btn />
+            <x-nav-actions />
         </header>
 
         <section>
