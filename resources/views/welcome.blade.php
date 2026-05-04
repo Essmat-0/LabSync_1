@@ -540,7 +540,6 @@
     @endguest
     @auth
         <H3> Welcome {{ auth()->user()->name }}</h1>
-            <x-logout-btn />
         @endauth
         <div class="shell">
 
