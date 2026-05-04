@@ -536,10 +536,11 @@
 
 <body>
     @guest
-        <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+    <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
     @endguest
     @auth
         <H3> Welcome {{ auth()->user()->name }}</h1>
+            <x-logout-btn />
         @endauth
         <div class="shell">
 
@@ -550,6 +551,7 @@
                     <h1>Equipment <span>Registry</span></h1>
                     <p class="header-meta">Last updated &mdash; {{ now()->format('d M Y, H:i') }}</p>
                 </div>
+                <x-logout-welcome />
 
                 <div class="controls">
                     {{-- Search --}}
@@ -574,10 +576,10 @@
 
                     {{-- Add button (show only to admins/techs) --}}
                     @can('create', App\Models\Equipment::class)
-                        <a href="{{ route('equipment.create') }}" class="btn btn-primary"
-                            style="flex:none; padding:.6rem 1.2rem;">
-                            + Add Equipment
-                        </a>
+                    <a href="{{ route('equipment.create') }}" class="btn btn-primary"
+                        style="flex:none; padding:.6rem 1.2rem;">
+                        + Add Equipment
+                    </a>
                     @endcan
                 </div>
             </header>
@@ -585,10 +587,10 @@
             {{-- ── Stats bar ── --}}
             @php
 
-                $total = $equipment->total();
-                $available = $equipment->getCollection()->where('status', 'Available')->count();
-                $inUse = $equipment->getCollection()->where('status', 'In Use')->count();
-                $maintenance = $equipment->getCollection()->where('status', 'Maintenance')->count();
+            $total = $equipment->total();
+            $available = $equipment->getCollection()->where('status', 'Available')->count();
+            $inUse = $equipment->getCollection()->where('status', 'In Use')->count();
+            $maintenance = $equipment->getCollection()->where('status', 'Maintenance')->count();
             @endphp
 
             <div class="stats-bar">
@@ -615,115 +617,116 @@
 
                 @forelse ($equipment as $item)
 
-                    @php
-                        $badgeClass = match ($item->status) {
-                            'Available' => 'badge-available',
-                            'In Use' => 'badge-in-use',
-                            'Maintenance' => 'badge-maintenance',
-                            default => 'badge-unavailable',
-                        };
+                @php
+                $badgeClass = match ($item->status) {
+                'Available' => 'badge-available',
+                'In Use' => 'badge-in-use',
+                'Maintenance' => 'badge-maintenance',
+                default => 'badge-unavailable',
+                };
 
-                        $canBook =
-                            $item->status === 'Available' &&
-                            auth()->user()?->clearance_level >= $item->required_clearance;
-                    @endphp
+                $canBook =
+                $item->status === 'Available' &&
+                auth()->user()?->clearance_level >= $item->required_clearance;
+                @endphp
 
-                    <div class="card" data-name="{{ strtolower($item->name) }}" data-status="{{ $item->status }}">
-                        {{-- Top row --}}
-                        <div class="card-top">
-                            <span class="card-id">#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
-                            <span class="badge {{ $badgeClass }}">{{ $item->status }}</span>
-                        </div>
-
-                        {{-- Name --}}
-                        <div class="card-name">{{ $item->name }}</div>
-
-                        <div class="card-divider"></div>
-
-                        {{-- Meta --}}
-                        <div class="meta-list">
-                            <div class="meta-row">
-                                <span class="meta-key">Hourly Rate</span>
-                                <span class="meta-val accent">${{ number_format($item->hourly_rate, 2) }}/hr</span>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-key">Clearance Req.</span>
-                                <div class="pips">
-                                    @for ($i = 1; $i <= 3; $i++)
-                                        <div class="pip {{ $i <= $item->required_clearance ? 'on' : '' }}"></div>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div class="meta-row">
-                                <span class="meta-key">Added</span>
-                                <span class="meta-val">{{ $item->created_at->format('d M Y') }}</span>
-                            </div>
-                        </div>
-
-                        <div class="card-divider"></div>
-
-                        {{-- Footer actions --}}
-                        <div class="card-footer">
-                            <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
-                                View Details
-                            </a>
-
-                            @auth
-                                @if ($canBook)
-                                    <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-primary">
-                                        Book Session
-                                    </a>
-                                @else
-                                    <span class="btn btn-primary disabled"
-                                        title="{{ $item->status !== 'Available' ? 'Equipment unavailable' : 'Insufficient clearance' }}">
-                                        {{ $item->status !== 'Available' ? 'Unavailable' : 'No Clearance' }}
-                                    </span>
-                                @endif
-                            @endauth
-                        </div>
+                <div class="card" data-name="{{ strtolower($item->name) }}" data-status="{{ $item->status }}">
+                    {{-- Top row --}}
+                    <div class="card-top">
+                        <span class="card-id">#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
+                        <span class="badge {{ $badgeClass }}">{{ $item->status }}</span>
                     </div>
 
-                @empty
+                    {{-- Name --}}
+                    <div class="card-name">{{ $item->name }}</div>
 
-                    <div class="empty">
-                        <div class="empty-icon">🔬</div>
-                        <div class="empty-title">No equipment found</div>
-                        <p class="empty-sub">No equipment has been registered yet.</p>
+                    <div class="card-divider"></div>
+
+                    {{-- Meta --}}
+                    <div class="meta-list">
+                        <div class="meta-row">
+                            <span class="meta-key">Hourly Rate</span>
+                            <span class="meta-val accent">${{ number_format($item->hourly_rate, 2) }}/hr</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-key">Clearance Req.</span>
+                            <div class="pips">
+                                @for ($i = 1; $i <= 3; $i++)
+                                    <div class="pip {{ $i <= $item->required_clearance ? 'on' : '' }}">
+                            </div>
+                            @endfor
+                        </div>
                     </div>
+                    <div class="meta-row">
+                        <span class="meta-key">Added</span>
+                        <span class="meta-val">{{ $item->created_at->format('d M Y') }}</span>
+                    </div>
+                </div>
 
-                @endforelse
+                <div class="card-divider"></div>
 
-                <div id="no-results">No equipment matches your search.</div>
+                {{-- Footer actions --}}
+                <div class="card-footer">
+                    <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
+                        View Details
+                    </a>
 
+                    @auth
+                    @if ($canBook)
+                    <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-primary">
+                        Book Session
+                    </a>
+                    @else
+                    <span class="btn btn-primary disabled"
+                        title="{{ $item->status !== 'Available' ? 'Equipment unavailable' : 'Insufficient clearance' }}">
+                        {{ $item->status !== 'Available' ? 'Unavailable' : 'No Clearance' }}
+                    </span>
+                    @endif
+                    @endauth
+                </div>
             </div>
 
-            {{-- ── Pagination ── --}}
-            @if ($equipment->hasPages())
-                <div class="pagination">
-                    {{-- Previous --}}
-                    @if ($equipment->onFirstPage())
-                        <span class="disabled">&larr;</span>
-                    @else
-                        <a href="{{ $equipment->previousPageUrl() }}">&larr;</a>
-                    @endif
+            @empty
 
-                    {{-- Page numbers --}}
-                    @foreach ($equipment->getUrlRange(1, $equipment->lastPage()) as $page => $url)
-                        @if ($page == $equipment->currentPage())
-                            <span class="active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $url }}">{{ $page }}</a>
-                        @endif
-                    @endforeach
+            <div class="empty">
+                <div class="empty-icon">🔬</div>
+                <div class="empty-title">No equipment found</div>
+                <p class="empty-sub">No equipment has been registered yet.</p>
+            </div>
 
-                    {{-- Next --}}
-                    @if ($equipment->hasMorePages())
-                        <a href="{{ $equipment->nextPageUrl() }}">&rarr;</a>
-                    @else
-                        <span class="disabled">&rarr;</span>
-                    @endif
-                </div>
+            @endforelse
+
+            <div id="no-results">No equipment matches your search.</div>
+
+        </div>
+
+        {{-- ── Pagination ── --}}
+        @if ($equipment->hasPages())
+        <div class="pagination">
+            {{-- Previous --}}
+            @if ($equipment->onFirstPage())
+            <span class="disabled">&larr;</span>
+            @else
+            <a href="{{ $equipment->previousPageUrl() }}">&larr;</a>
             @endif
+
+            {{-- Page numbers --}}
+            @foreach ($equipment->getUrlRange(1, $equipment->lastPage()) as $page => $url)
+            @if ($page == $equipment->currentPage())
+            <span class="active">{{ $page }}</span>
+            @else
+            <a href="{{ $url }}">{{ $page }}</a>
+            @endif
+            @endforeach
+
+            {{-- Next --}}
+            @if ($equipment->hasMorePages())
+            <a href="{{ $equipment->nextPageUrl() }}">&rarr;</a>
+            @else
+            <span class="disabled">&rarr;</span>
+            @endif
+        </div>
+        @endif
 
         </div>{{-- /shell --}}
 

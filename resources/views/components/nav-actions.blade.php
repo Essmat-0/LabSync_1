@@ -17,14 +17,6 @@
     </form>
 </div>
 {{-- resources/views/components/logout-welcome.blade.php --}}
-<form method="POST" action="{{ route('logout') }}" class="m-0">
-    @csrf
-    <button type="submit" class="welcome-logout-btn">
-        <span class="cmd-prefix">#</span>
-        <span class="btn-label">DISCONNECT</span>
-        <span class="status-indicator"></span>
-    </button>
-</form>
 
 <style>
     /* resources/css/app.css */

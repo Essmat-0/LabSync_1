@@ -60,6 +60,35 @@ textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
+/* resources/css/app.css */
+
+/* Shared styles for both buttons */
+.terminal-btn, .welcome-logout-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    text-decoration: none;
+    height: 38px;
+    font-family: var(--font-mono);
+}
+
+.cmd-prefix { color: var(--accent); font-weight: 700; }
+.btn-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; }
+.status-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+
+/* Hover effects */
+.terminal-btn:hover, .welcome-logout-btn:hover { border-color: var(--accent); background: rgba(200, 240, 74, 0.05); }
+.terminal-btn:hover .btn-label, .welcome-logout-btn:hover .btn-label { color: var(--text); }
+
+/* Specific Red hover for Logouts */
+.logout:hover, .welcome-logout-btn:hover { border-color: var(--red); background: rgba(255, 77, 90, 0.05); }
+.logout:hover .status-indicator, .welcome-logout-btn:hover .status-indicator { background: var(--red); box-shadow: 0 0 8px var(--red); }
 
 /* \[:where(&)\]:size-4 {
     @apply size-4;
