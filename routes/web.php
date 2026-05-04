@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
 
-Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
 
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
     Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:Admin')->name('admin.dashboard');
 
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:Lab_Manager')->name('labmanager.dashboard');
