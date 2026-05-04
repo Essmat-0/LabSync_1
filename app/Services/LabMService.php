@@ -18,6 +18,11 @@ class LabMService
             'status' => $data['equipment_status'],
             'hourly_rate' => $data['hourly_rate'],
             'required_clearance'     => $data['required_clearance'],
+            'category_id' => $data['category_id'],
+            'location_code' => $data['location_code'],
+            'total_usage_hours' => Equipment::totalUsageHours(),
+            'calibration_threshold' => $data['calibration_threshold'],
+            'cooldown_buffer' => $data['cooldown_buffer'],
         ];
 
         return  Equipment::updateOrCreate(['name' => $data['equipment_name']], $values);

@@ -23,6 +23,10 @@ class LabManagerController extends Controller
             'equipment_status' => 'required|string',
             'hourly_rate'  => 'required|numeric',
             'required_clearance' => 'required|integer',
+            'category_id' => 'required|integer',
+            'location_code' => 'required|string',
+            'calibration_threshold' => 'required|numeric',
+            'cooldown_buffer' => 'required|integer',
         ];
         $validated = $request->validate($rules);
 
@@ -40,6 +44,5 @@ class LabManagerController extends Controller
         $id = $request->input('equipment_id');
         $this->labService->deleteEquipment($request->equipment_id);
         return "Deleted Equipment with ID: " . $id;
-        
     }
 }

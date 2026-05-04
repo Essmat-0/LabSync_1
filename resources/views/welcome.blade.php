@@ -665,13 +665,13 @@
 
                         {{-- Footer actions --}}
                         <div class="card-footer">
-                            <a href="{{ route('researcher.dashboard', $item->id) }}" class="btn btn-ghost">
+                            <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
                                 View Details
                             </a>
 
                             @auth
                                 @if ($canBook)
-                                    <a href="{{ route('researcher.dashboard', $item->id) }}" class="btn btn-primary">
+                                    <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-primary">
                                         Book Session
                                     </a>
                                 @else

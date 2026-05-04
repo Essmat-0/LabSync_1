@@ -41,3 +41,5 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
     Route::post('/LabmStoreEquipment', [LabManagerController::class, 'store'])->name('LabM.equipment.store');
     Route::delete('/LabmDeleteEquipment', [LabManagerController::class, 'destroy'])->name('LabM.equipment.destroy');
 });
+
+Route::get('/equipment/{id}', [EquipmentController::class, 'show'])->name('equipment.show');

@@ -42,6 +42,19 @@
         <label>Required Clearance</label>
         <input type="number" name="required_clearance" placeholder="1" min="0" max="3" required> <br>
 
+        <label>Equipment Category ID</label>
+        <input type="number" name="category_id" required> <br>
+
+        <label>Location Code</label>
+        <input type="text" name="location_code" required> <br>
+
+        <label>Calibration Threshold</label>
+        <input type="number" step="0.1" name="calibration_threshold" placeholder="Number in hours" required> <br>
+
+        <label>Cooldown Buffer</label>
+        <input type="number" name="cooldown_buffer" placeholder="'2'" required> <br>
+
+
 
         <button type="submit" style="margin-top: 10px;">Add/Update Equipment</button>
     </form>

@@ -17,6 +17,11 @@ class Equipment extends Model
         'status',
         'hourly_rate',
         'required_clearance',
+        'category_id',
+        'total_usage_hours',
+        'location_code',
+        'calibration_threshold',
+        'cooldown_buffer'
     ];
 
 
@@ -24,4 +29,9 @@ class Equipment extends Model
         'hourly_rate' => 'float',
         'required_clearance' => 'integer',
     ];
+
+    public static function totalUsageHours()
+    {
+        return 0;
+    }
 }
