@@ -532,19 +532,68 @@
             }
         }
 
-        .dashboardbtn {
-            background: transparent;
-            border: 1px solid var(--border);
-            padding: 0.6rem 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 4px;
-            text-decoration: none;
-            height: 38px;
-        }
+        /* Layout helper for the top row */
+/* Layout helper for the top row */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Changed from flex-end to center for better vertical leveling */
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-left h1 {
+    line-height: 1; /* Prevents hidden descender space from pushing the baseline */
+    margin: 4px 0;
+}
+
+/* Container for the two terminal buttons */
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    height: 38px; /* Matches the fixed height of the buttons */
+}
+
+.terminal-dashboard-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 0 1.2rem; /* Vertical padding removed to rely on height + flex center */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    text-decoration: none;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+.terminal-dashboard-btn .btn-prompt {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.terminal-dashboard-btn .btn-text {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+}
+
+.terminal-dashboard-btn:hover {
+    border-color: var(--accent);
+    background: rgba(200, 240, 74, 0.05);
+}
+
+.terminal-dashboard-btn:hover .btn-text {
+    color: var(--text);
+}
     </style>
 </head>
 
@@ -552,56 +601,59 @@
     @guest
         <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
     @endguest
-    @auth
-        @if (!auth()->user()->isResearcher())
-            <button><a class="dashboardbtn" href="{{ route(auth()->user()->role->name . '.dashboard') }}">
-                    Go to {{ auth()->user()->role->name }} Dashboard
-                </a></button>
-        @endif
-    @endauth
+
     <div class="shell">
 
         {{-- ── Header ── --}}
-        <header>
-            <div class="header-left">
-                <p class="eyebrow">// Lab Management System</p>
-                <h1>Equipment <span>Registry</span></h1>
-                <p class="header-meta">Last updated &mdash; {{ now()->format('d M Y, H:i') }}</p>
-            </div>
-            <x-logout-welcome />
+       <header>
+    <div class="header-top">
+        <div class="header-left">
+            <p class="eyebrow">// Lab Management System</p>
+            <h1>Equipment <span>Registry</span></h1>
+            <p class="header-meta">Last updated &mdash; {{ now()->format('d M Y, H:i') }}</p>
+        </div>
 
-
-            <div class="controls">
-                {{-- Search --}}
-                <div class="search-wrap">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                        viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                    </svg>
-                    <input id="search" class="search-input" type="text" placeholder="Search equipment…"
-                        autocomplete="off" />
-                </div>
-
-                {{-- Status filter --}}
-                <select id="status-filter" class="filter-select">
-                    <option value="">All statuses</option>
-                    <option value="Available">Available</option>
-                    <option value="In Use">In Use</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Unavailable">Unavailable</option>
-                </select>
-
-                {{-- Add button (show only to admins/techs) --}}
-                @can('create', App\Models\Equipment::class)
-                    <a href="{{ route('equipment.create') }}" class="btn btn-primary"
-                        style="flex:none; padding:.6rem 1.2rem;">
-                        + Add Equipment
+        <div class="header-actions">
+            @auth
+                @if (!auth()->user()->isResearcher())
+                    <a href="{{ route(auth()->user()->role->name . '.dashboard') }}" class="terminal-dashboard-btn">
+                        <span class="btn-prompt">></span>
+                        <span class="btn-text">{{ strtoupper(auth()->user()->role->name) }}</span>
                     </a>
-                @endcan
-            </div>
-        </header>
+                @endif
+            @endauth
+            {{-- This component must not have external margins --}}
+            <x-logout-welcome />
+        </div>
+    </div>
 
+    <div class="controls">
+        {{-- Search --}}
+        <div class="search-wrap">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input id="search" class="search-input" type="text" placeholder="Search equipment…" autocomplete="off" />
+        </div>
+
+        {{-- Status filter --}}
+        <select id="status-filter" class="filter-select">
+            <option value="">All statuses</option>
+            <option value="Available">Available</option>
+            <option value="In Use">In Use</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Unavailable">Unavailable</option>
+        </select>
+
+        {{-- Add button --}}
+        @can('create', App\Models\Equipment::class)
+            <a href="{{ route('equipment.create') }}" class="btn btn-primary" style="height:38px; display:inline-flex; align-items:center; padding: 0 1.2rem;">
+                + Add Equipment
+            </a>
+        @endcan
+    </div>
+</header>
         {{-- ── Stats bar ── --}}
         @php
 
