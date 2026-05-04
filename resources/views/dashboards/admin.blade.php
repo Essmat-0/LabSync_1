@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Terminal | LabSync</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #0b0c0f;
@@ -13,7 +15,8 @@
             --border: #1e2028;
             --text: #e8eaf0;
             --muted: #5a5e72;
-            --accent: #c8f04a; /* electric lime */
+            --accent: #c8f04a;
+            /* electric lime */
             --red: #ff4d5a;
             --font-head: 'Syne', sans-serif;
             --font-mono: 'DM Mono', monospace;
@@ -64,8 +67,17 @@
             margin: 0;
         }
 
-        h1 { font-size: 3rem; font-weight: 800; margin: 0.5rem 0; text-transform: uppercase; }
-        h1 span { color: var(--muted); font-weight: 400; }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            text-transform: uppercase;
+        }
+
+        h1 span {
+            color: var(--muted);
+            font-weight: 400;
+        }
 
         section {
             background: var(--surface);
@@ -104,9 +116,14 @@
             transition: border-color 0.3s;
         }
 
-        .terminal-input-group:focus-within { border-color: var(--accent); }
+        .terminal-input-group:focus-within {
+            border-color: var(--accent);
+        }
 
-        .field-core { flex: 1; padding: 12px 16px; }
+        .field-core {
+            flex: 1;
+            padding: 12px 16px;
+        }
 
         .field-core label {
             display: block;
@@ -144,11 +161,21 @@
             letter-spacing: 1px;
         }
 
-        .btn-terminate:hover { background: var(--red); color: #fff; }
+        .btn-terminate:hover {
+            background: var(--red);
+            color: #fff;
+        }
 
         /* ── Form Controls (Add Section) ── */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .full-width { grid-column: span 2; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
 
         .standard-input {
             width: 100%;
@@ -162,7 +189,9 @@
             margin-top: 0.5rem;
         }
 
-        .standard-input:focus { border-color: var(--accent); }
+        .standard-input:focus {
+            border-color: var(--accent);
+        }
 
         .btn-primary {
             background: var(--accent);
@@ -180,12 +209,30 @@
             transition: transform 0.2s, filter 0.2s;
         }
 
-        .btn-primary:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
 
         /* ── Custom Radio Buttons ── */
-        .radio-button-container { display: flex; gap: 24px; margin-bottom: 2rem; }
-        .radio-button { position: relative; cursor: pointer; }
-        .radio-button__input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-button-container {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 2rem;
+        }
+
+        .radio-button {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .radio-button__input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
         .radio-button__label {
             display: inline-block;
             padding-left: 30px;
@@ -197,20 +244,27 @@
             cursor: pointer;
             text-transform: uppercase;
         }
+
         .radio-button__custom {
             position: absolute;
-            top: 0; left: 0;
-            width: 18px; height: 18px;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 2px solid var(--border);
             transition: 0.3s;
         }
-        .radio-button__input:checked + .radio-button__label .radio-button__custom {
+
+        .radio-button__input:checked+.radio-button__label .radio-button__custom {
             background-color: var(--accent);
             border-color: transparent;
             box-shadow: 0 0 15px var(--accent);
         }
-        .radio-button__input:checked + .radio-button__label { color: var(--accent); }
+
+        .radio-button__input:checked+.radio-button__label {
+            color: var(--accent);
+        }
 
         .alert {
             background: rgba(200, 240, 74, 0.1);
@@ -224,6 +278,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="shell">
@@ -233,12 +288,16 @@
                 <h1>Admin <span>Panel</span></h1>
             </div>
 
-            {{-- RESTORED YOUR ORIGINAL COMPONENT --}}
             <x-nav-actions />
         </header>
 
         <section>
             <h2>Access Termination</h2>
+            @if (session('successDelete'))
+                <div class="alert">
+                    STATUS_OK: {{ session('successDelete') }}
+                </div>
+            @endif
             <form method="POST" action="/adminDeleteUser">
                 @csrf
                 @method('DELETE')
@@ -249,7 +308,11 @@
                     </div>
                     <button type="submit" class="btn-terminate">
                         <span>TERMINATE</span>
-                        <svg width="14" viewBox="0 0 448 512" fill="currentColor"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+                        <svg width="14" viewBox="0 0 448 512" fill="currentColor">
+                            <path
+                                d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </form>
@@ -260,7 +323,7 @@
 
             @if (session('success'))
                 <div class="alert">
-                    > STATUS_OK: {{ session('success') }}
+                    STATUS_OK: {{ session('success') }}
                 </div>
             @endif
 
@@ -269,17 +332,27 @@
 
                 <div class="radio-button-container">
                     <div class="radio-button">
-                        <input type="radio" class="radio-button__input" id="radioPI" name="user_role" value="PI" onchange="toggleFields('PI')" required>
+                        <input type="radio" class="radio-button__input" id="radioPI" name="user_role" value="PI"
+                            onchange="toggleFields('PI')" required>
                         <label class="radio-button__label" for="radioPI">
                             <span class="radio-button__custom"></span>
                             PI
                         </label>
                     </div>
                     <div class="radio-button">
-                        <input type="radio" class="radio-button__input" id="radioLabM" name="user_role" value="Lab_Manager" onchange="toggleFields('LabM')" required>
+                        <input type="radio" class="radio-button__input" id="radioLabM" name="user_role"
+                            value="Lab_Manager" onchange="toggleFields('LabM')" required>
                         <label class="radio-button__label" for="radioLabM">
                             <span class="radio-button__custom"></span>
                             Lab Manager
+                        </label>
+                    </div>
+                    <div class="radio-button">
+                        <input type="radio" class="radio-button__input" id="radioAuditor" name="user_role"
+                            value="Auditor" onchange="toggleFields('Auditor')" required>
+                        <label class="radio-button__label" for="radioAuditor">
+                            <span class="radio-button__custom"></span>
+                            Auditor
                         </label>
                     </div>
                 </div>
@@ -287,12 +360,14 @@
                 <div class="form-grid">
                     <div class="full-width">
                         <label>User Identity</label>
-                        <input type="text" name="user_name" class="standard-input" placeholder="Enter full name" required>
+                        <input type="text" name="user_name" class="standard-input" placeholder="Enter full name"
+                            required>
                     </div>
 
                     <div>
                         <label>Network Email</label>
-                        <input type="email" name="user_email" class="standard-input" placeholder="email@labsync.sys" required>
+                        <input type="email" name="user_email" class="standard-input" placeholder="email@labsync.sys"
+                            required>
                     </div>
 
                     <div>
@@ -307,12 +382,19 @@
 
                     <div id="pi_fields" style="display:none;" class="full-width">
                         <label>Budget Allocation ($)</label>
-                        <input type="number" id="budget_input" name="budget_limit" class="standard-input" placeholder="5000">
+                        <input type="number" id="budget_input" name="budget_limit" class="standard-input"
+                            placeholder="5000">
                     </div>
 
                     <div id="labm_fields" style="display:none;" class="full-width">
                         <label>Assigned Lab Sectors</label>
-                        <input type="text" id="lab_input" name="lab_locations" class="standard-input" placeholder="Sector A, Sector B">
+                        <input type="text" id="lab_input" name="lab_locations" class="standard-input"
+                            placeholder="Sector A, Sector B">
+                    </div>
+                    <div id="auditor_fields" style="display:none;" class="full-width">
+                        <label>Audit Scope</label>
+                        <input type="text" id="audit_input" name="audit_scope" class="standard-input"
+                            placeholder="m3rfsh">
                     </div>
                 </div>
 
@@ -327,19 +409,33 @@
             const labDiv = document.getElementById('labm_fields');
             const bIn = document.getElementById('budget_input');
             const lIn = document.getElementById('lab_input');
+            const AuDiv = document.getElementById('auditor_fields');
+            const AuIn = document.getElementById('audit_input');
 
             if (role === 'PI') {
                 piDiv.style.display = 'block';
                 labDiv.style.display = 'none';
+                AuDiv.style.display = 'none';
                 bIn.required = true;
                 lIn.required = false;
+                AuIn.required = false;
             } else if (role === 'LabM') {
                 piDiv.style.display = 'none';
                 labDiv.style.display = 'block';
+                AuDiv.style.display = 'none';
                 lIn.required = true;
                 bIn.required = false;
+                AuIn.required = false;
+            } else if (role === 'Auditor') {
+                piDiv.style.display = 'none';
+                labDiv.style.display = 'none';
+                AuDiv.style.display = 'block';
+                lIn.required = false;
+                bIn.required = false;
+                AuIn.required = true;
             }
         }
     </script>
 </body>
+
 </html>

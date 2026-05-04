@@ -19,33 +19,36 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
+
         $rules = [
             'user_name'  => 'required|string',
-            'user_email' => 'required|email|unique:users,email',
+            'user_email' => 'required|email|unique:users,email,' . (User::where('email', $request->user_email)->first()->id ?? 'NULL'),
             'user_role'  => 'required|exists:roles,name',
             'user_pass'  =>  User::where('email', $request->user_email)->exists()
                 ? 'nullable|min:6'
                 : 'required|min:6',
             'expiry_date' => 'required|date',
         ];
-        
+
         if ($request->user_role === 'PI')
             $rules['budget_limit'] = 'required|numeric';
-        else
+        elseif ($request->user_role === 'Lab_Manager')
             $rules['lab_locations'] = 'required|string';
+        else
+            $rules['audit_scope'] = 'required|string';
 
         $validated = $request->validate($rules);
 
         $user = $this->adminService->storeOrUpdateUser($validated);
-        
+
         $status = $user->wasRecentlyCreated ? 'created' : 'updated';
-        return redirect()->back()->with('success', "User {$user->name} was successfully {{$status}}");
+        return redirect()->back()->with('success', "{request->user_role} {$user->name} was successfully {{$status}}");
     }
 
     public function destroy(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|string|exists:users,user_id',
+            'user_id' => 'required|integer|exists:users,id',
         ]);
 
         $id = $request->input('user_id');
@@ -56,6 +59,6 @@ class AdminController extends Controller
         }
 
         $this->adminService->deleteUser($request->user_id);
-        return "Deleted user with ID: " . $id;
+        return redirect()->back()->with('successDelete', "Deleted user with ID: {$id}");
     }
 }

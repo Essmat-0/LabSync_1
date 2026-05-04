@@ -24,8 +24,10 @@ class AdminService
             'password' => Hash::make($data['user_pass']),
             'budget_limit' => $data['budget_limit'] ?? null,
             'managed_Lab_Locations' => $data['lab_locations'] ?? null,
+            'audit_scope' => $data['audit_scope'] ?? null,
             'is_active'     => true,
             'expiry_date'   => $data['expiry_date'],
+
         ];
 
         if (!empty($data['user_pass'])) {
@@ -37,6 +39,6 @@ class AdminService
 
     public function deleteUser($id)
     {
-        return  User::where('user_id', $id)->firstOrFail()->delete();
+        return  User::where('id', $id)->firstOrFail()->delete();
     }
 }

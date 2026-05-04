@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuditorController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\LabManagerController;
 use App\Http\Controllers\PiController;
@@ -22,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:Lab_Manager')->name('Lab_Manager.dashboard');
     Route::get('/researcher/dashboard', fn() => view('dashboards.researcher'))->middleware('role:Researcher')->name('Researcher.dashboard');
 
-    Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:PI')->name('Pi.dashboard');
+    Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:PI')->name('PI.dashboard');
 
     Route::get('/auditor/dashboard', fn() => view('dashboards.auditor'))->middleware('role:Auditor')->name('Auditor.dashboard');
     Route::post('/logout', [Logout::class, '__invoke'])->name('logout');
@@ -43,3 +44,5 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
 });
 
 Route::get('/equipment/{id}', [EquipmentController::class, 'show'])->name('equipment.show');
+
+Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware(['auth', 'role:Auditor']);
