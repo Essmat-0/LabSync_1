@@ -14,19 +14,19 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
 
-
+// welcome page
 Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
 
 Route::middleware(['auth'])->group(function () {
+    //Dashboards
     Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:Admin')->name('Admin.dashboard');
-
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:Lab_Manager')->name('Lab_Manager.dashboard');
-    Route::get('/researcher', fn() => view('welcome'))->middleware('role:Researcher')->name('Researcher.dashboard');
-
     Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:PI')->name('PI.dashboard');
+    Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware('role:Auditor');
 
-    Route::get('/auditor/dashboard', fn() => view('dashboards.auditor'))->middleware('role:Auditor')->name('Auditor.dashboard');
+    //Functions    
     Route::post('/logout', [Logout::class, '__invoke'])->name('logout');
+    Route::get('/equipment/{id}', [EquipmentController::class, 'show'])->name('equipment.show');
 });
 
 Route::middleware(['auth', 'role:Admin'])->group(function () {
@@ -42,7 +42,3 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
     Route::post('/LabmStoreEquipment', [LabManagerController::class, 'store'])->name('LabM.equipment.store');
     Route::delete('/LabmDeleteEquipment', [LabManagerController::class, 'destroy'])->name('LabM.equipment.destroy');
 });
-
-Route::get('/equipment/{id}', [EquipmentController::class, 'show'])->name('equipment.show');
-
-Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware(['auth', 'role:Auditor']);
