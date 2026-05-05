@@ -28,11 +28,13 @@ class AdminController extends Controller
                 ? 'nullable|min:6'
                 : 'required|min:6',
             'expiry_date' => 'required|date',
+            'system_priviliges' => 'required|string',
         ];
 
-        if ($request->user_role === 'PI')
+        if ($request->user_role === 'PI') {
             $rules['budget_limit'] = 'required|numeric';
-        elseif ($request->user_role === 'Lab_Manager')
+            $rules['affiliation'] = 'required|string';
+        } elseif ($request->user_role === 'Lab_Manager')
             $rules['lab_locations'] = 'required|string';
         else
             $rules['audit_scope'] = 'required|string';
@@ -42,7 +44,7 @@ class AdminController extends Controller
         $user = $this->adminService->storeOrUpdateUser($validated);
 
         $status = $user->wasRecentlyCreated ? 'created' : 'updated';
-        return redirect()->back()->with('success', "{request->user_role} {$user->name} was successfully {{$status}}");
+        return redirect()->back()->with('success', "{$request->user_role} {$user->name} was successfully {$status}");
     }
 
     public function destroy(Request $request)

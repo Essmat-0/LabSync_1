@@ -38,4 +38,8 @@ class Equipment extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+    public function reservation()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }

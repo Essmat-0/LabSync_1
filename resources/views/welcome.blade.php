@@ -699,8 +699,9 @@
                     };
                     $category = $item->category->name ?? 'No Category';
                     $canBook =
-                        $item->status === 'Idle' && auth()->user()?->clearance_level >= $item->required_clearance;
-
+                        $item->status === 'Idle' &&
+                        auth()->user()?->clearance_level >= $item->required_clearance &&
+                        auth()->user()->isResearcher();
                 @endphp
 
                 <div class="card" data-name="{{ strtolower($item->name) }}" data-status="{{ $item->status }}">
@@ -755,8 +756,8 @@
                                 </a>
                             @else
                                 <span class="btn btn-primary disabled"
-                                    title="{{ $item->status !== 'Available' ? 'Equipment unavailable' : 'Insufficient clearance' }}">
-                                    {{ $item->status !== 'Available' ? 'Unavailable' : 'No Clearance' }}
+                                    title="{{ $item->status !== 'Idle' ? 'Equipment unavailable' : 'Insufficient clearance' }}">
+                                    {{ auth()->user()->isResearcher() ? ($item->status !== 'Idle' ? 'Unavailable' : 'No Clearance') : 'You aren\'t authorized to Book' }}
                                 </span>
                             @endif
                         @endauth

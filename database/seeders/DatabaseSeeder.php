@@ -11,297 +11,519 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ──────────────────────────────────────────
+        // ----------------------------------------------------------------
         // 1. ROLES
-        // ──────────────────────────────────────────
-        $roles = [
-            ['name' => 'Admin',      'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'PI',         'created_at' => now(), 'updated_at' => now()], // Principal Investigator
-            ['name' => 'Researcher', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Lab_Manager', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Auditor', 'created_at' => now(), 'updated_at' => now()],
-        ];
-        DB::table('roles')->insert($roles);
+        // ----------------------------------------------------------------
+        $roles = ['Admin', 'PI', 'Researcher', 'Lab_Manager', 'Auditor'];
+        foreach ($roles as $role) {
+            DB::table('roles')->insert([
+                'name'       => $role,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         $adminRoleId      = DB::table('roles')->where('name', 'Admin')->value('id');
         $piRoleId         = DB::table('roles')->where('name', 'PI')->value('id');
         $researcherRoleId = DB::table('roles')->where('name', 'Researcher')->value('id');
-        $LabManagerRoleId = DB::table('roles')->where('name', 'Lab_Manager')->value('id');
+        $LabmRoleId = DB::table('roles')->where('name', 'Lab_Manager')->value('id');
+        $auditorRoleId = DB::table('roles')->where('name', 'Auditor')->value('id');
 
-        // ──────────────────────────────────────────
-        // 2. USERS  (5 rows)
-        // ──────────────────────────────────────────
+        // ----------------------------------------------------------------
+        // 2. USERS  (base columns + columns added in second migration)
+        // ----------------------------------------------------------------
         $users = [
             [
-                'name'                 => 'Alice Morgan',
-                'email'                => 'alice@lab.edu',
-                'password'             => Hash::make('password'),
-                'clearance_level'      => 3,
-                'role_id'              => $adminRoleId,
-                'is_active'            => true,
-                'expiry_date'          => '2027-12-31',
-                'academicLevel'        => null,           // Admins don't have academic levels
-                'pis_id'               => null,           // Admin is not under a PI
-                'affiliation'          => 'Lab Administration',
-                'budget_limit'         => null,           // Admins don't have budget limits
-                'managed_Lab_Locations' => 'Lab A, Lab B, Lab C',
-                'audit_scope'          => 'Full System',
-                'systemPrivileges'     => 'super_admin',
-                'created_at'           => now(),
-                'updated_at' => now(),
+                'name'                  => 'Alice Admin',
+                'email'                 => 'alice@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 3,
+                'role_id'               => $adminRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2027-01-01',
+                'systemPrivileges'      => 'superadmin',
             ],
             [
-                'name'                 => 'Dr. Brian Cole',
-                'email'                => 'bcole@lab.edu',
-                'password'             => Hash::make('password'),
-                'clearance_level'      => 3,
-                'role_id'              => $piRoleId,
-                'is_active'            => true,
-                'expiry_date'          => '2026-08-31',
-                'academicLevel'        => 'Professor',
-                'pis_id'               => null,           // PI has no PI above them
-                'affiliation'          => 'Department of Biochemistry',
-                'budget_limit'         => 50000.00,
-                'managed_Lab_Locations' => 'Lab B',
-                'audit_scope'          => 'Lab B',
-                'systemPrivileges'     => 'grant_management',
-                'created_at'           => now(),
-                'updated_at' => now(),
+                'name'                  => 'Bob PI',
+                'email'                 => 'bob@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 2,
+                'role_id'               => $piRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2026-12-31',
+                'systemPrivileges'      => 'none',
             ],
             [
-                'name'                 => 'Sara Kim',
-                'email'                => 'skim@lab.edu',
-                'password'             => Hash::make('password'),
-                'clearance_level'      => 2,
-                'role_id'              => $researcherRoleId,
-                'is_active'            => true,
-                'expiry_date'          => '2025-12-31',
-                'academicLevel'        => 'PhD Student',
-                'pis_id'               => 2,              // Under Dr. Brian Cole (id=2)
-                'affiliation'          => 'Department of Biochemistry',
-                'budget_limit'         => 5000.00,
-                'managed_Lab_Locations' => null,
-                'audit_scope'          => null,
-                'systemPrivileges'     => 'none',
-                'created_at'           => now(),
-                'updated_at' => now(),
+                'name'                  => 'Carol Researcher',
+                'email'                 => 'carol@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 2,
+                'role_id'               => $researcherRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2026-06-30',
+                'systemPrivileges'      => 'none',
             ],
             [
-                'name'                 => 'James Patel',
-                'email'                => 'jpatel@lab.edu',
-                'password'             => Hash::make('password'),
-                'clearance_level'      => 1,
-                'role_id'              => $researcherRoleId,
-                'is_active'            => true,
-                'expiry_date'          => '2026-05-30',
-                'academicLevel'        => 'Masters Student',
-                'pis_id'               => 2,              // Under Dr. Brian Cole (id=2)
-                'affiliation'          => 'Department of Biochemistry',
-                'budget_limit'         => 2000.00,
-                'managed_Lab_Locations' => null,
-                'audit_scope'          => null,
-                'systemPrivileges'     => 'none',
-                'created_at'           => now(),
-                'updated_at' => now(),
+                'name'                  => 'Dan Maintenance',
+                'email'                 => 'dan@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 3,
+                'role_id'               => $LabmRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2027-06-01',
+                'systemPrivileges'      => 'none',
             ],
             [
-                'name'                 => 'Nina Torres',
-                'email'                => 'ntorres@lab.edu',
-                'password'             => Hash::make('password'),
-                'clearance_level'      => 2,
-                'role_id'              => $LabManagerRoleId,
-                'is_active'            => true,
-                'expiry_date'          => '2026-11-15',
-                'academicLevel'        => 'BSc',
-                'pis_id'               => 2,              // Assigned to Dr. Brian Cole's lab
-                'affiliation'          => 'Core Facilities Unit',
-                'budget_limit'         => null,           // Technicians don't manage budgets
-                'managed_Lab_Locations' => 'Lab A',        // Technicians can manage a location
-                'audit_scope'          => 'Equipment Only',
-                'systemPrivileges'     => 'equipment_management',
-                'created_at'           => now(),
-                'updated_at' => now(),
+                'name'                  => 'Eve Researcher',
+                'email'                 => 'eve@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 1,
+                'role_id'               => $researcherRoleId,
+                'is_active'             => false,
+                'expiry_date'           => '2025-12-31',
+                'systemPrivileges'      => 'none',
+            ],
+            [
+                'name'                  => 'Auditor Hamada',
+                'email'                 => 'auditor@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 1,
+                'role_id'               => $auditorRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2025-12-31',
+                'systemPrivileges'      => 'none',
+            ],
+
+            [
+                'name'                  => 'PI Hamada',
+                'email'                 => 'pi@lab.com',
+                'password'              => Hash::make('password'),
+                'clearance_level'       => 3,
+                'role_id'               => $piRoleId,
+                'is_active'             => true,
+                'expiry_date'           => '2026-12-31',
+                'systemPrivileges'      => 'none',
             ],
         ];
-        DB::table('users')->insert($users);
 
-        $alice = DB::table('users')->where('email', 'alice@lab.edu')->value('id');
-        $brian = DB::table('users')->where('email', 'bcole@lab.edu')->value('id');
-        $sara  = DB::table('users')->where('email', 'skim@lab.edu')->value('id');
-        $james = DB::table('users')->where('email', 'jpatel@lab.edu')->value('id');
-        $nina  = DB::table('users')->where('email', 'ntorres@lab.edu')->value('id');
+        foreach ($users as $user) {
+            DB::table('users')->insert(array_merge($user, [
+                'remember_token' => null,
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ]));
+        }
 
-        // ──────────────────────────────────────────
-        // 3. EQUIPMENT
-        // ──────────────────────────────────────────
+        [$aliceId, $bobId, $carolId, $danId, $eveId, $auditorId, $PIId] = DB::table('users')->orderBy('id')->pluck('id')->toArray();
+
+        // ----------------------------------------------------------------
+        // 3. EQUIPMENT CATEGORIES
+        // ----------------------------------------------------------------
+        $categories = [
+            ['name' => 'Microscopy',       'description' => 'Optical and electron microscopy equipment'],
+            ['name' => 'Spectroscopy',     'description' => 'Spectroscopic analysis instruments'],
+            ['name' => 'Fabrication',      'description' => 'Material fabrication and deposition tools'],
+            ['name' => 'Characterization', 'description' => 'Material and sample characterization tools'],
+        ];
+
+        foreach ($categories as $cat) {
+            DB::table('equipment_categories')->insert($cat);
+        }
+
+        [$microCatId, $specCatId, $fabCatId, $charCatId] = DB::table('equipment_categories')->orderBy('id')->pluck('id')->toArray();
+
+        // ----------------------------------------------------------------
+        // 4. EQUIPMENT  (base + columns added in second migration)
+        // ----------------------------------------------------------------
         $equipment = [
-            ['name' => 'Electron Microscope',  'status' => 'Available', 'hourly_rate' => 150.00, 'required_clearance' => 3, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Mass Spectrometer',    'status' => 'Available', 'hourly_rate' => 120.00, 'required_clearance' => 2, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'PCR Thermal Cycler',   'status' => 'In Use',    'hourly_rate' =>  45.00, 'required_clearance' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Centrifuge XL-5000',   'status' => 'Available', 'hourly_rate' =>  30.00, 'required_clearance' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Confocal Microscope',  'status' => 'Maintenance', 'hourly_rate' => 200.00, 'required_clearance' => 3, 'created_at' => now(), 'updated_at' => now()],
+            [
+                'name'                  => 'SEM Zeiss Sigma',
+                'status'                => 'Idle',
+                'hourly_rate'           => 75.00,
+                'required_clearance'    => 3,
+                'category_id'           => $microCatId,
+                'location_code'         => 'RM-101-A',
+                'total_usage_hours'     => 320.5,
+                'calibration_threshold' => 500.0,
+                'cooldown_buffer'       => 30,
+            ],
+            [
+                'name'                  => 'FTIR Spectrometer',
+                'status'                => 'Idle',
+                'hourly_rate'           => 40.00,
+                'required_clearance'    => 2,
+                'category_id'           => $specCatId,
+                'location_code'         => 'RM-201-B',
+                'total_usage_hours'     => 150.0,
+                'calibration_threshold' => 300.0,
+                'cooldown_buffer'       => 15,
+            ],
+            [
+                'name'                  => 'Sputter Coater',
+                'status'                => 'Maintenance',
+                'hourly_rate'           => 55.00,
+                'required_clearance'    => 1,
+                'category_id'           => $fabCatId,
+                'location_code'         => 'RM-301-C',
+                'total_usage_hours'     => 490.0,
+                'calibration_threshold' => 500.0,
+                'cooldown_buffer'       => 60,
+            ],
+            [
+                'name'                  => 'XRD Bruker D8',
+                'status'                => 'Idle',
+                'hourly_rate'           => 60.00,
+                'required_clearance'    => 1,
+                'category_id'           => $charCatId,
+                'location_code'         => 'RM-102-A',
+                'total_usage_hours'     => 80.0,
+                'calibration_threshold' => 400.0,
+                'cooldown_buffer'       => 0,
+            ],
+            [
+                'name'                  => 'micro micro micro',
+                'status'                => 'Locked',
+                'hourly_rate'           => 60.00,
+                'required_clearance'    => 2,
+                'category_id'           => $charCatId,
+                'location_code'         => 'RM-102-A',
+                'total_usage_hours'     => 80.0,
+                'calibration_threshold' => 400.0,
+                'cooldown_buffer'       => 0,
+            ],
+            [
+                'name'                  => 'Zerbew micro',
+                'status'                => 'Active',
+                'hourly_rate'           => 160.00,
+                'required_clearance'    => 3,
+                'category_id'           => $charCatId,
+                'location_code'         => 'RM-102-A',
+                'total_usage_hours'     => 80.0,
+                'calibration_threshold' => 400.0,
+                'cooldown_buffer'       => 0,
+            ],
         ];
-        DB::table('equipment')->insert($equipment);
 
-        $em   = DB::table('equipment')->where('name', 'Electron Microscope')->value('id');
-        $ms   = DB::table('equipment')->where('name', 'Mass Spectrometer')->value('id');
-        $pcr  = DB::table('equipment')->where('name', 'PCR Thermal Cycler')->value('id');
-        $cent = DB::table('equipment')->where('name', 'Centrifuge XL-5000')->value('id');
-        $conf = DB::table('equipment')->where('name', 'Confocal Microscope')->value('id');
+        foreach ($equipment as $eq) {
+            DB::table('equipment')->insert(array_merge($eq, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
 
-        // ──────────────────────────────────────────
-        // 4. CERTIFICATIONS
-        //    Users must be certified for equipment
-        //    whose required_clearance matches their level
-        // ──────────────────────────────────────────
-        DB::table('certifications')->insert([
-            ['user_id' => $alice, 'equipment_id' => $em,   'expiry_date' => '2026-12-01', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $alice, 'equipment_id' => $conf, 'expiry_date' => '2026-08-15', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $brian, 'equipment_id' => $em,   'expiry_date' => '2026-11-20', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $brian, 'equipment_id' => $ms,   'expiry_date' => '2026-09-30', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $sara,  'equipment_id' => $ms,   'expiry_date' => '2025-12-31', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $sara,  'equipment_id' => $pcr,  'expiry_date' => '2026-06-01', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $james, 'equipment_id' => $pcr,  'expiry_date' => '2026-03-15', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $james, 'equipment_id' => $cent, 'expiry_date' => '2026-07-01', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $nina,  'equipment_id' => $ms,   'expiry_date' => '2026-10-10', 'created_at' => now(), 'updated_at' => now()],
-            ['user_id' => $nina,  'equipment_id' => $cent, 'expiry_date' => '2026-05-20', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        [$semId, $ftirId, $sputterID, $xrdId] = DB::table('equipment')->orderBy('id')->pluck('id')->toArray();
 
-        // ──────────────────────────────────────────
-        // 5. EQUIPMENT SESSIONS
-        // ──────────────────────────────────────────
+        // ----------------------------------------------------------------
+        // 5. PROFILES
+        // ----------------------------------------------------------------
+        $pi_profiles = [
+            ['user_id' => $bobId, 'budget_limit' => 3250, 'affiliation' => 'Physics Dept'],
+            ['user_id' => $PIId,  'budget_limit' => 5390, 'affiliation' => 'Biology Dept'],
+        ];
+
+        foreach ($pi_profiles as $pi_profile) {
+            DB::table('pi_profiles')->insert($pi_profile);
+        }
+        $labm_profiles = [
+            ['user_id' => $LabmRoleId, 'managed_Lab_Locations' => 'October, Zayed'],
+        ];
+
+        foreach ($labm_profiles as $labm_profile) {
+            DB::table('labm_profiles')->insert($labm_profile);
+        }
+        $auditor_profiles = [
+            ['user_id' => $auditorId, 'audit_scope' => 'Finance and Logs'],
+        ];
+
+        foreach ($auditor_profiles as $auditor_profile) {
+            DB::table('auditor_profiles')->insert($auditor_profile);
+        }
+        $researcher_profiles = [
+            ['user_id' => $carolId, 'academicLevel' => 'PhD', 'pis_id' => $PIId],
+        ];
+
+        foreach ($researcher_profiles as $researcher_profile) {
+            DB::table('researcher_profiles')->insert($researcher_profile);
+        }
+
+        // ----------------------------------------------------------------
+        // 6. GRANTS
+        // ----------------------------------------------------------------
+        $grants = [
+            ['name' => 'NSF Grant 2024',    'pi_id' => $bobId, 'balance' => 25000.00],
+            ['name' => 'DOE Seed Fund',     'pi_id' => $PIId, 'balance' => 10000.00],
+            ['name' => 'Internal Fund',     'pi_id' => null,   'balance' => 5000.00],
+        ];
+
+        foreach ($grants as $grant) {
+            DB::table('grants')->insert(array_merge($grant, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        [$grant1Id, $grant2Id, $grant3Id] = DB::table('grants')->orderBy('id')->pluck('id')->toArray();
+
+        // ----------------------------------------------------------------
+        // 7. CERTIFICATIONS  (base + equipment_category_id from 2nd migration)
+        // ----------------------------------------------------------------
+        $certifications = [
+            ['user_id' => $carolId, 'equipment_id' => $semId,    'equipment_category_id' => $microCatId, 'expiry_date' => '2026-12-31'],
+            ['user_id' => $carolId, 'equipment_id' => $ftirId,   'equipment_category_id' => $specCatId,  'expiry_date' => '2026-09-30'],
+            ['user_id' => $eveId,   'equipment_id' => $xrdId,    'equipment_category_id' => $charCatId,  'expiry_date' => '2025-11-30'],
+            ['user_id' => $danId,   'equipment_id' => $sputterID, 'equipment_category_id' => $fabCatId,   'expiry_date' => '2027-03-01'],
+        ];
+
+        foreach ($certifications as $cert) {
+            DB::table('certifications')->insert(array_merge($cert, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 8. SAFETY LOGS
+        // ----------------------------------------------------------------
+        $safetyLogs = [
+            ['user_id' => $carolId, 'equipment_category_id' => $microCatId, 'acknowledgment_status' => true,  'user_ip' => '192.168.1.10'],
+            ['user_id' => $carolId, 'equipment_category_id' => $specCatId,  'acknowledgment_status' => true,  'user_ip' => '192.168.1.10'],
+            ['user_id' => $eveId,   'equipment_category_id' => $charCatId,  'acknowledgment_status' => false, 'user_ip' => '192.168.1.20'],
+        ];
+
+        foreach ($safetyLogs as $log) {
+            DB::table('safety_logs')->insert(array_merge($log, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        [$safetyLog1Id, $safetyLog2Id, $safetyLog3Id] = DB::table('safety_logs')->orderBy('id')->pluck('id')->toArray();
+
+        // ----------------------------------------------------------------
+        // 9. RESERVATIONS
+        // ----------------------------------------------------------------
+        $reservations = [
+            [
+                'user_id'       => $carolId,
+                'equipment_id'  => $semId,
+                'safety_log_id' => $safetyLog1Id,
+                'grant_id'      => $grant1Id,
+                'start_time'    => Carbon::now()->addDays(1)->setTime(9, 0),
+                'end_time'      => Carbon::now()->addDays(1)->setTime(11, 0),
+                'status'        => 'Pending',
+            ],
+            [
+                'user_id'       => $carolId,
+                'equipment_id'  => $ftirId,
+                'safety_log_id' => $safetyLog2Id,
+                'grant_id'      => $grant2Id,
+                'start_time'    => Carbon::now()->addDays(2)->setTime(13, 0),
+                'end_time'      => Carbon::now()->addDays(2)->setTime(15, 0),
+                'status'        => 'Approved',
+            ],
+            [
+                'user_id'       => $eveId,
+                'equipment_id'  => $xrdId,
+                'safety_log_id' => null,
+                'grant_id'      => null,
+                'start_time'    => Carbon::now()->subDays(3)->setTime(10, 0),
+                'end_time'      => Carbon::now()->subDays(3)->setTime(12, 0),
+                'status'        => 'Cancelled',
+            ],
+        ];
+
+        foreach ($reservations as $res) {
+            DB::table('reservations')->insert(array_merge($res, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 10. EQUIPMENT SESSIONS
+        // ----------------------------------------------------------------
         $sessions = [
-            // Completed sessions (have end_time + amount)
             [
-                'user_id'         => $brian,
-                'equipment_id'    => $em,
-                'start_time'      => Carbon::now()->subDays(10)->setTime(9, 0),
-                'end_time'        => Carbon::now()->subDays(10)->setTime(11, 0),
+                'user_id'         => $carolId,
+                'equipment_id'    => $semId,
+                'start_time'      => Carbon::now()->subDays(5)->setTime(9, 0),
+                'end_time'        => Carbon::now()->subDays(5)->setTime(11, 0),
                 'status'          => 'Completed',
                 'approval_status' => 'Approved',
-                'created_at'      => now(),
-                'updated_at' => now(),
             ],
             [
-                'user_id'         => $sara,
-                'equipment_id'    => $ms,
-                'start_time'      => Carbon::now()->subDays(7)->setTime(13, 0),
-                'end_time'        => Carbon::now()->subDays(7)->setTime(15, 30),
+                'user_id'         => $carolId,
+                'equipment_id'    => $ftirId,
+                'start_time'      => Carbon::now()->subDays(3)->setTime(14, 0),
+                'end_time'        => Carbon::now()->subDays(3)->setTime(16, 0),
                 'status'          => 'Completed',
                 'approval_status' => 'Approved',
-                'created_at'      => now(),
-                'updated_at' => now(),
             ],
             [
-                'user_id'         => $james,
-                'equipment_id'    => $pcr,
-                'start_time'      => Carbon::now()->subDays(3)->setTime(10, 0),
-                'end_time'        => Carbon::now()->subDays(3)->setTime(12, 0),
-                'status'          => 'Completed',
-                'approval_status' => 'Approved',
-                'created_at'      => now(),
-                'updated_at' => now(),
-            ],
-            // Active session
-            [
-                'user_id'         => $nina,
-                'equipment_id'    => $cent,
-                'start_time'      => Carbon::now()->subHours(2),
+                'user_id'         => $eveId,
+                'equipment_id'    => $xrdId,
+                'start_time'      => Carbon::now()->subDays(1)->setTime(10, 0),
                 'end_time'        => null,
                 'status'          => 'Active',
                 'approval_status' => 'Approved',
-                'created_at'      => now(),
-                'updated_at' => now(),
-            ],
-            // Pending session
-            [
-                'user_id'         => $alice,
-                'equipment_id'    => $em,
-                'start_time'      => Carbon::now()->addDays(2)->setTime(9, 0),
-                'end_time'        => null,
-                'status'          => 'Pending',
-                'approval_status' => 'Pending',
-                'created_at'      => now(),
-                'updated_at' => now(),
             ],
         ];
-        DB::table('equipment_sessions')->insert($sessions);
 
-        $s1 = DB::table('equipment_sessions')->where('user_id', $brian)->where('equipment_id', $em)->value('id');
-        $s2 = DB::table('equipment_sessions')->where('user_id', $sara)->where('equipment_id', $ms)->value('id');
-        $s3 = DB::table('equipment_sessions')->where('user_id', $james)->where('equipment_id', $pcr)->value('id');
+        foreach ($sessions as $session) {
+            DB::table('equipment_sessions')->insert(array_merge($session, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
 
-        // ──────────────────────────────────────────
-        // 6. TRANSACTIONS  (only for Completed sessions)
-        //    amount = hours × hourly_rate
-        // ──────────────────────────────────────────
-        DB::table('transactions')->insert([
-            // Brian: 2h × $150 = $300
-            ['session_id' => $s1, 'amount' => 300.00, 'normalized_amount' => 285.00, 'created_at' => now(), 'updated_at' => now()],
-            // Sara: 2.5h × $120 = $300
-            ['session_id' => $s2, 'amount' => 300.00, 'normalized_amount' => 300.00, 'created_at' => now(), 'updated_at' => now()],
-            // James: 2h × $45 = $90
-            ['session_id' => $s3, 'amount' =>  90.00, 'normalized_amount' =>  90.00, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        [$session1Id, $session2Id, $session3Id] = DB::table('equipment_sessions')->orderBy('id')->pluck('id')->toArray();
 
-        // ──────────────────────────────────────────
-        // 7. GRANTS  (PI users hold grants)
-        // ──────────────────────────────────────────
-        DB::table('grants')->insert([
-            ['pi_id' => $brian, 'balance' => 25000.00, 'created_at' => now(), 'updated_at' => now()],
-            ['pi_id' => $alice, 'balance' => 10000.00, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // ----------------------------------------------------------------
+        // 11. TRANSACTIONS
+        // ----------------------------------------------------------------
+        $transactions = [
+            ['session_id' => $session1Id, 'amount' => 150.00, 'normalized_amount' => 142.50],
+            ['session_id' => $session2Id, 'amount' => 80.00,  'normalized_amount' => 76.00],
+        ];
 
-        // ──────────────────────────────────────────
-        // 8. MAINTENANCE LOGS
-        // ──────────────────────────────────────────
-        DB::table('maintenance_logs')->insert([
-            ['equipment_id' => $conf, 'cost' => 1200.00, 'description' => 'Laser alignment and calibration after detected drift in Z-axis.', 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $em,   'cost' =>  350.00, 'description' => 'Routine vacuum pump service and filament replacement.',           'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $ms,   'cost' =>  500.00, 'description' => 'Ion source cleaning and mass calibration verification.',           'created_at' => now(), 'updated_at' => now()],
-        ]);
+        foreach ($transactions as $tx) {
+            DB::table('transactions')->insert(array_merge($tx, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
 
-        // ──────────────────────────────────────────
-        // 9. PUBLICATION LINKS
-        // ──────────────────────────────────────────
-        DB::table('publication_links')->insert([
-            ['equipment_id' => $em,  'doi' => '10.1038/s41586-024-00101-1', 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $ms,  'doi' => '10.1021/acs.analchem.4c00234', 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $pcr, 'doi' => '10.1016/j.gene.2024.148321',  'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $em,  'doi' => '10.1126/science.adh8765',      'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // ----------------------------------------------------------------
+        // 12. MAINTENANCE LOGS
+        // ----------------------------------------------------------------
+        $maintenanceLogs = [
+            [
+                'equipment_id' => $sputterID,
+                'cost'         => 1200.00,
+                'description'  => 'Replaced target material and recalibrated deposition rate. Full system diagnostic performed.',
+            ],
+            [
+                'equipment_id' => $semId,
+                'cost'         => 350.00,
+                'description'  => 'Replaced filament and performed chamber cleaning. Alignment verified.',
+            ],
+        ];
 
-        // ──────────────────────────────────────────
-        // 10. ROI REPORTS
-        // ──────────────────────────────────────────
-        DB::table('roi_reports')->insert([
-            ['equipment_id' => $em,   'roi_score' => 4.75, 'recommendation' => 'Keep',    'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $ms,   'roi_score' => 3.90, 'recommendation' => 'Keep',    'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $pcr,  'roi_score' => 2.10, 'recommendation' => 'Review',  'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $conf, 'roi_score' => 1.50, 'recommendation' => 'Retire',  'created_at' => now(), 'updated_at' => now()],
-        ]);
+        foreach ($maintenanceLogs as $log) {
+            DB::table('maintenance_logs')->insert(array_merge($log, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
 
-        // ──────────────────────────────────────────
-        // 11. UTILIZATION CACHE
-        // ──────────────────────────────────────────
-        DB::table('utilization_cache')->insert([
-            ['equipment_id' => $em,   'usage_percentage' => 78.50, 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $ms,   'usage_percentage' => 65.20, 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $pcr,  'usage_percentage' => 91.00, 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $cent, 'usage_percentage' => 45.75, 'created_at' => now(), 'updated_at' => now()],
-            ['equipment_id' => $conf, 'usage_percentage' => 12.30, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // ----------------------------------------------------------------
+        // 13. PUBLICATION LINKS
+        // ----------------------------------------------------------------
+        $publications = [
+            ['equipment_id' => $semId,  'doi' => '10.1038/s41586-024-00001-x'],
+            ['equipment_id' => $ftirId, 'doi' => '10.1021/acs.analchem.4c00001'],
+            ['equipment_id' => $xrdId,  'doi' => '10.1107/S1600576724000001'],
+        ];
 
-        // ──────────────────────────────────────────
-        // 12. AUDIT TRAILS
-        // ──────────────────────────────────────────
-        DB::table('audit_trails')->insert([
-            ['user_id' => $alice, 'action' => 'Created equipment: Electron Microscope',      'created_at' => now()],
-            ['user_id' => $alice, 'action' => 'Created equipment: Confocal Microscope',      'created_at' => now()],
-            ['user_id' => $brian, 'action' => 'Started session on Electron Microscope',      'created_at' => now()],
-            ['user_id' => $sara,  'action' => 'Started session on Mass Spectrometer',        'created_at' => now()],
-            ['user_id' => $alice, 'action' => 'Flagged Confocal Microscope for maintenance', 'created_at' => now()],
-            ['user_id' => $james, 'action' => 'Completed session on PCR Thermal Cycler',     'created_at' => now()],
-        ]);
+        foreach ($publications as $pub) {
+            DB::table('publication_links')->insert(array_merge($pub, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 14. ROI REPORTS
+        // ----------------------------------------------------------------
+        $roiReports = [
+            ['equipment_id' => $semId,    'roi_score' => 4.25, 'recommendation' => 'Keep'],
+            ['equipment_id' => $ftirId,   'roi_score' => 3.10, 'recommendation' => 'Keep'],
+            ['equipment_id' => $sputterID, 'roi_score' => 1.50, 'recommendation' => 'Review'],
+            ['equipment_id' => $xrdId,    'roi_score' => 2.80, 'recommendation' => 'Keep'],
+        ];
+
+        foreach ($roiReports as $report) {
+            DB::table('roi_reports')->insert(array_merge($report, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 15. UTILIZATION CACHE
+        // ----------------------------------------------------------------
+        $utilizationCache = [
+            ['equipment_id' => $semId,    'usage_percentage' => 64.10],
+            ['equipment_id' => $ftirId,   'usage_percentage' => 50.00],
+            ['equipment_id' => $sputterID, 'usage_percentage' => 98.00],
+            ['equipment_id' => $xrdId,    'usage_percentage' => 20.00],
+        ];
+
+        foreach ($utilizationCache as $cache) {
+            DB::table('utilization_cache')->insert(array_merge($cache, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 16. AUDIT TRAILS  (base + user_ip from 2nd migration)
+        // ----------------------------------------------------------------
+        $auditTrails = [
+            ['user_id' => $aliceId, 'action' => 'Created equipment: SEM Zeiss Sigma',  'user_ip' => '10.0.0.1'],
+            ['user_id' => $aliceId, 'action' => 'Approved session #1 for Carol',        'user_ip' => '10.0.0.1'],
+            ['user_id' => $carolId, 'action' => 'Started session on SEM Zeiss Sigma',   'user_ip' => '192.168.1.10'],
+            ['user_id' => $danId,   'action' => 'Logged maintenance on Sputter Coater', 'user_ip' => '192.168.1.30'],
+        ];
+
+        foreach ($auditTrails as $trail) {
+            DB::table('audit_trails')->insert(array_merge($trail, [
+                'created_at' => now(),
+            ]));
+        }
+
+        // ----------------------------------------------------------------
+        // 17. INTERLOCK PROXIES
+        // ----------------------------------------------------------------
+        $interlocks = [
+            ['equipment_id' => $semId,    'access_level' => 'researcher'],
+            ['equipment_id' => $sputterID, 'access_level' => 'Admin'],
+            ['equipment_id' => $ftirId,   'access_level' => 'researcher'],
+            ['equipment_id' => $xrdId,    'access_level' => 'researcher'],
+        ];
+
+        foreach ($interlocks as $interlock) {
+            DB::table('Interlock_proxies')->insert($interlock);
+        }
+
+        // ----------------------------------------------------------------
+        // 18. CONSUMABLES
+        // ----------------------------------------------------------------
+        $consumables = [
+            ['name' => 'Carbon Tape',          'stock_level' => 200],
+            ['name' => 'Sputter Target (Au)',   'stock_level' => 5],
+            ['name' => 'KBr Pellet Powder',     'stock_level' => 50],
+            ['name' => 'Sample Holders',        'stock_level' => 30],
+        ];
+
+        foreach ($consumables as $consumable) {
+            DB::table('consumables')->insert($consumable);
+        }
+
+        [$tape, $target, $kbr, $holder] = DB::table('consumables')->orderBy('id')->pluck('id')->toArray();
+
+        // ----------------------------------------------------------------
+        // 19. EQUIPMENT CONSUMABLES  (pivot)
+        // ----------------------------------------------------------------
+        $equipmentConsumables = [
+            ['equipment_id' => $semId,    'consumable_id' => $tape],
+            ['equipment_id' => $semId,    'consumable_id' => $holder],
+            ['equipment_id' => $sputterID, 'consumable_id' => $target],
+            ['equipment_id' => $ftirId,   'consumable_id' => $kbr],
+        ];
+
+        foreach ($equipmentConsumables as $ec) {
+            DB::table('equipment_consumables')->insert($ec);
+        }
     }
 }

@@ -45,10 +45,33 @@ return new class extends Migration
             $table->decimal('normalized_amount', 10, 2)->nullable();
             $table->timestamps();
         });
+        Schema::create('pi_profiles', function (Blueprint $table) {
+
+            $table->foreignId('user_id')->primary()->constrained('users')->cascadeOnDelete();
+            $table->float('budget_limit')->nullable();
+            $table->string('affiliation')->nullable();
+        });
+
+        Schema::create('labm_profiles', function (Blueprint $table) {
+            $table->foreignId('user_id')->primary()->constrained('users')->cascadeOnDelete();
+            $table->string('managed_Lab_Locations')->nullable();
+        });
+
+        Schema::create('auditor_profiles', function (Blueprint $table) {
+            $table->foreignId('user_id')->primary()->constrained('users')->cascadeOnDelete();
+            $table->string('audit_scope')->nullable();
+        });
+
+        Schema::create('researcher_profiles', function (Blueprint $table) {
+            $table->foreignId('user_id')->primary()->constrained('users')->cascadeOnDelete();
+            $table->string('academicLevel')->nullable();
+            $table->foreignId('pis_id')->nullable()->constrained('pi_profiles', 'user_id')->nullOnDelete();
+        });
 
         Schema::create('grants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pi_id')->constrained('users')->cascadeOnDelete();
+            $table->string('name')->nullable();
+            $table->foreignId('pi_id')->nullable()->constrained('pi_profiles', 'user_id')->nullOnDelete();
             $table->decimal('balance', 10, 2)->default(0.00);
             $table->timestamps();
         });
@@ -89,21 +112,7 @@ return new class extends Migration
             $table->string('action');
             $table->timestamp('created_at')->useCurrent();
         });
-
-        DB::statement("DROP VIEW IF EXISTS session_summary"); // Good practice to drop first
-        DB::statement("
-    CREATE VIEW session_summary AS
-    SELECT 
-        u.name as user_name, 
-        e.name AS equipment_name, 
-        s.start_time, 
-        s.end_time
-    FROM equipment_sessions s
-    JOIN users u ON s.user_id = u.id
-    JOIN equipment e ON s.equipment_id = e.id
-");
     }
-
     public function down(): void
     {
         DB::statement("DROP VIEW IF EXISTS session_summary");

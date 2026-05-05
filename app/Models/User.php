@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\AuditorProfile;
+use App\Models\LabmProfile;
+use App\Models\PiProfile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
@@ -60,10 +62,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    public function certifications(){
+    public function certifications()
+    {
         return $this->hasMany(Certification::class);
     }
-    
+
     protected $with = ['role'];
 
     public function isResearcher(): bool
@@ -76,7 +79,21 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
-
+    public function piProfile()
+    {
+        return $this->hasOne(PiProfile::class);
+    }
+    public function auditorProfile()
+    {
+        return $this->hasOne(AuditorProfile::class);
+    }
+    public function labmProfile()
+    {
+        return $this->hasOne(LabmProfile::class);
+    }
+    public function researcherProfile(){
+        return $this->hasOne(ResearcherProfile::class);
+    }
     // Return iD 
     public function getID()
     {

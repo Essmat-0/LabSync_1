@@ -23,8 +23,11 @@ return new class extends Migration
             $table->string('name', 100);
             $table->string('email', 100)->unique();
             $table->string('password'); // Laravel handles length automatically (default 255)
-            $table->integer('clearance_level')->default(0);
             $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+            $table->integer('clearance_level')->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->date('expiry_date');
+            $table->string('systemPrivileges')->default('none');
             $table->rememberToken(); // Best practice for auth
             $table->timestamps();
         });

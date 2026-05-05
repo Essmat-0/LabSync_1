@@ -374,6 +374,11 @@
                         <label>Initial Passcode</label>
                         <input type="password" name="user_pass" class="standard-input" placeholder="••••••••" required>
                     </div>
+                    <div class="full-width">
+                        <label>System Previliges</label>
+                        <input type="text" name="system_priviliges" class="standard-input" placeholder="superadmin"
+                            required>
+                    </div>
 
                     <div class="full-width">
                         <label>Authorization Expiry</label>
@@ -384,6 +389,9 @@
                         <label>Budget Allocation ($)</label>
                         <input type="number" id="budget_input" name="budget_limit" class="standard-input"
                             placeholder="5000">
+                        <label>Affiliation</label>
+                        <input type="text" id="aff_input" name="affiliation" class="standard-input"
+                            placeholder="Physics Dept">
                     </div>
 
                     <div id="labm_fields" style="display:none;" class="full-width">
@@ -408,6 +416,7 @@
             const piDiv = document.getElementById('pi_fields');
             const labDiv = document.getElementById('labm_fields');
             const bIn = document.getElementById('budget_input');
+            const aIn = document.getElementById('aff_input');
             const lIn = document.getElementById('lab_input');
             const AuDiv = document.getElementById('auditor_fields');
             const AuIn = document.getElementById('audit_input');
@@ -417,6 +426,7 @@
                 labDiv.style.display = 'none';
                 AuDiv.style.display = 'none';
                 bIn.required = true;
+                aIn.required = true;
                 lIn.required = false;
                 AuIn.required = false;
             } else if (role === 'LabM') {
@@ -425,6 +435,7 @@
                 AuDiv.style.display = 'none';
                 lIn.required = true;
                 bIn.required = false;
+                aIn.required = false;
                 AuIn.required = false;
             } else if (role === 'Auditor') {
                 piDiv.style.display = 'none';
@@ -432,6 +443,7 @@
                 AuDiv.style.display = 'block';
                 lIn.required = false;
                 bIn.required = false;
+                aIn.required = false;
                 AuIn.required = true;
             }
         }

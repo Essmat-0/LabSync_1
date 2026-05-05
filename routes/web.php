@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditorController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\LabManagerController;
 use App\Http\Controllers\PiController;
+use App\Http\Controllers\ReservationController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -41,4 +42,8 @@ Route::middleware(['auth', 'role:PI'])->group(function () {
 route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
     Route::post('/LabmStoreEquipment', [LabManagerController::class, 'store'])->name('LabM.equipment.store');
     Route::delete('/LabmDeleteEquipment', [LabManagerController::class, 'destroy'])->name('LabM.equipment.destroy');
+});
+
+Route::middleware(['auth' , 'role:Researcher'])->group(function (){
+    Route::post('BookEquipment', [ReservationController::class, 'book'])->name('equipment.book'); 
 });
