@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -48,5 +49,20 @@ class PiService
             );
             return $user;
         });
+    }
+
+
+
+
+    public function notifyPI(Reservation $reservation): void {}
+
+    public function approve(Reservation $reservation): void
+    {
+        $reservation->update(['status' => 'Approved']);
+    }
+
+    public function reject(Reservation $reservation): void
+    {
+        $reservation->update(['status' => 'Rejected']);
     }
 }

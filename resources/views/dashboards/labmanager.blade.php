@@ -256,9 +256,10 @@
                 <div class="form-group full-width" style="margin-bottom: 1.5rem;">
                     <label>Operational Status</label>
                     <div class="status-container">
-                        <label class="status-option"><input type="radio" name="equipment_status" value="Available" required> Available</label>
-                        <label class="status-option"><input type="radio" name="equipment_status" value="In Use" required> In Use</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Idle" required> Available</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Active" required> In Use</label>
                         <label class="status-option"><input type="radio" name="equipment_status" value="Maintenance" required> Maintenance</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Locked" required> Maintenance</label>
                     </div>
                 </div>
 

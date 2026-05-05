@@ -598,6 +598,17 @@
         .terminal-dashboard-btn:hover .btn-text {
             color: var(--text);
         }
+
+        .alert {
+            background: rgba(200, 240, 74, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -630,6 +641,12 @@
                 </div>
             </div>
 
+
+            @if (session('success'))
+                <div class="alert">
+                    STATUS_OK: {{ session('success') }}
+                </div>
+            @endif
             <div class="controls">
                 {{-- Search --}}
                 <div class="search-wrap">
@@ -751,7 +768,7 @@
 
                         @auth
                             @if ($canBook)
-                                <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-primary">
+                                <a href="{{ route('equipment.book', $item->id) }}" class="btn btn-primary">
                                     Book Session
                                 </a>
                             @else

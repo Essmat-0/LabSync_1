@@ -22,7 +22,7 @@ Route::middleware(['auth'])->group(function () {
     //Dashboards
     Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:Admin')->name('Admin.dashboard');
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:Lab_Manager')->name('Lab_Manager.dashboard');
-    Route::get('/pi/dashboard', fn() => view('dashboards.pi'))->middleware('role:PI')->name('PI.dashboard');
+    Route::get('/pi/dashboard', [PiController::class, 'dashboard'])->middleware('role:PI')->name('PI.dashboard');
     Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware('role:Auditor');
 
     //Functions    
@@ -37,6 +37,8 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
 Route::middleware(['auth', 'role:PI'])->group(function () {
     Route::post('/piAddResearcher', [PiController::class, 'store'])->name('pi.researcher.store');
+    Route::patch('/pi/reservations/{reservation}/approve', [PiController::class, 'approve'])->name('pi.reservation.approve');
+    Route::patch('/pi/reservations/{reservation}/reject', [PiController::class, 'reject'])->name('pi.reservation.reject');
 });
 
 route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
@@ -44,6 +46,7 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
     Route::delete('/LabmDeleteEquipment', [LabManagerController::class, 'destroy'])->name('LabM.equipment.destroy');
 });
 
-Route::middleware(['auth' , 'role:Researcher'])->group(function (){
-    Route::post('BookEquipment', [ReservationController::class, 'book'])->name('equipment.book'); 
+Route::middleware(['auth', 'role:Researcher'])->group(function () {
+    Route::get('/equipment/{id}/book',  [ReservationController::class, 'create'])->name('equipment.book');
+    Route::post('/equipment/{id}/book', [ReservationController::class, 'store'])->name('equipment.book.store');
 });

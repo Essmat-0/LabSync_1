@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reservation;
 use App\Models\User;
 use App\Services\PiService;
 use Illuminate\Http\Request;
@@ -33,5 +34,44 @@ class PiController extends Controller
         $status = $user->wasRecentlyCreated ? 'created' : 'updated';
 
         return redirect()->back()->with('success', "Researcher {$user->name} was successfully {$status}.");
+    }
+
+    public function dashboard()
+    {
+        // Pull every Pending reservation with just the two relations
+        // the blade needs: user name + equipment name.
+        $pendingReservations = Reservation::where('status', 'Pending')
+            ->with(['user', 'equipment'])   // add these relations to your models (see section 4)
+            ->orderBy('created_at', 'asc')  // oldest first — fairest queue order
+            ->get();
+
+        return view('dashboards.pi', compact('pendingReservations'));
+    }
+
+    public function approve(Reservation $reservation)
+    {
+        if ($reservation->status !== 'Pending') {
+            return redirect()->route('PI.dashboard', ['tab' => 'pending'])
+                ->with('error', 'Reservation is no longer pending.');
+        }
+
+        $this->piService->approve($reservation);
+
+        return redirect()->route('PI.dashboard', ['tab' => 'pending'])
+            ->with('success', "Reservation #{$reservation->id} approved.");
+    }
+
+    // ── Reject ────────────────────────────────────────────────
+    public function reject(Reservation $reservation)
+    {
+        if ($reservation->status !== 'Pending') {
+            return redirect()->route('PI.dashboard', ['tab' => 'pending'])
+                ->with('error', 'Reservation is no longer pending.');
+        }
+
+        $this->piService->reject($reservation);
+
+        return redirect()->route('PI.dashboard', ['tab' => 'pending'])
+            ->with('success', "Reservation #{$reservation->id} rejected.");
     }
 }

@@ -7,6 +7,7 @@ use App\Models\AuditorProfile;
 use App\Models\LabmProfile;
 use App\Models\PiProfile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -91,8 +92,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(LabmProfile::class);
     }
-    public function researcherProfile(){
+    public function researcherProfile()
+    {
         return $this->hasOne(ResearcherProfile::class);
+    }
+    public function reservation(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
     }
     // Return iD 
     public function getID()

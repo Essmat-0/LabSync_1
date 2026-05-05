@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Reservation extends Model
 {
     protected $fillable = [
-        'user__id',
+        'user_id',
         'equipment_id',
         'safety_log_id',
         'grant_id',
         'start_time',
         'end_time',
+        'status',
     ];
 
     protected $casts = [
@@ -20,16 +21,23 @@ class Reservation extends Model
         'end_time' => 'datetime',
     ];
 
-    public function equipment(){
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function equipment()
+    {
         return $this->belongsTo(Equipment::class);
     }
-    
-    public function safetyLog(){
+
+    public function safetyLog()
+    {
         return $this->belongsTo(SafetyLog::class);
     }
 
-    public function grant(){
+    public function grant()
+    {
         return $this->belongsTo(Grant::class);
     }
-    
 }
