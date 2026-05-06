@@ -39,7 +39,8 @@ class ReservationController extends Controller
 
         // 3. Call the service
         $this->reservationService->makeReservation($data);
-
+        $sessionController = app(EquipmentSessionController::class);
+        $sessionController->storeSessionTime($request);
         return redirect()->route('equipment.index')
             ->with('success', 'Reservation submitted and pending approval.');
     }

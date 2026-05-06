@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Config;
 
 class Equipment extends Model
@@ -35,6 +38,12 @@ class Equipment extends Model
     {
         return 0;
     }
+
+
+    public function equipment_session(): HasMany
+    {
+        return $this->hasMany(EquipmentSession::class);
+    }
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -44,4 +53,8 @@ class Equipment extends Model
         return $this->hasMany(Reservation::class);
     }
 
+    public function consumables(): BelongsToMany
+    {
+        return $this->belongsToMany(Consumable::class, 'equipment_consumables', 'equipment_id', 'consumable_id');
+    }
 }

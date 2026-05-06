@@ -1,13 +1,3 @@
-{{--
-    resources/views/equipment/book.blade.php
-
-    Route:
-        Route::get('/equipment/{id}/book',  [ReservationController::class, 'create'])->name('equipment.book');
-        Route::post('/equipment/{id}/book', [ReservationController::class, 'store'])->name('equipment.book.store');
-
-    Controller — ReservationController:
-        
---}}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +52,6 @@
         @if ($equipment->status !== 'Idle')
 
             <div class="blocked-card">
-                <div class="blocked-icon">🔒</div>
                 <div class="blocked-title">Equipment Unavailable</div>
                 <p class="blocked-msg">
                     This equipment is currently <strong>{{ $equipment->status }}</strong>
@@ -75,7 +64,6 @@
             {{-- ── Blocked: insufficient clearance ── --}}
         @elseif (auth()->user()->clearance_level < $equipment->required_clearance)
             <div class="blocked-card">
-                <div class="blocked-icon">⛔</div>
                 <div class="blocked-title">Insufficient Clearance</div>
                 <p class="blocked-msg">
                     This equipment requires clearance level <strong>{{ $equipment->required_clearance }}</strong>.
