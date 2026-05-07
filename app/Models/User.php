@@ -25,6 +25,11 @@ class User extends Authenticatable
     const ROLE_LAB_MANAGER   = 4;
     const ROLE_AUDITOR       = 5;
 
+    const UNDERGRAD = 0;
+    const GRAD = 1;
+    const MASTERS = 2;
+    const PHD = 3;
+
 
     // ---------------------------------------------------------------------------
     // Fillable / Hidden
@@ -69,7 +74,7 @@ class User extends Authenticatable
 
     public function piProfile()
     {
-        return $this->hasOne(PiProfile::class);
+        return $this->hasOne(PiProfile::class, 'user_id', 'id');
     }
     public function auditorProfile()
     {
@@ -97,9 +102,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reservation::class);
     }
+
+
     public function equipmentSession(): HasMany
     {
         return $this->hasMany(EquipmentSession::class);
+    }
+
+    public function forceEndSessions()
+    {
+        return $this->equipmentSession()->where('end_time', null)->update(['end_time' => now()]);
     }
     // Return iD 
     public function getID()
@@ -114,5 +126,23 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+
+
+
+
+    public function assignClearance(): string
+    {
+        if ($this->clearance_level == $this->UNDERGRAD)
+            return 'Undergraduate';
+        if ($this->clearance_level == $this->GRAD)
+            return 'Graduate';
+        if ($this->clearance_level == $this->MASTERS)
+            return 'Masters';
+        if ($this->clearance_level == $this->PHD)
+            return 'PhD';
+
+        return 'unknown';
     }
 }

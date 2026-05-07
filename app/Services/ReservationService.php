@@ -21,14 +21,6 @@ class ReservationService
             'status'       => 'Pending',
         ]);
         
-        EquipmentSession::create([
-            'user_id' => $data['user_id'],
-            'equipment_id' => $data['equipment_id'],
-            'start_time' => $data['start_time'],
-            'end_time'   => $data['end_time'],
-            // Add other fields if your session table requires them
-        ]);
-
         return $reservation;
     }
 

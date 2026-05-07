@@ -3,27 +3,30 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuditorController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\EquipmentSessionController;
 use App\Http\Controllers\LabManagerController;
 use App\Http\Controllers\PiController;
+use App\Http\Controllers\ResearcherController;
 use App\Http\Controllers\ReservationController;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
-use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Route;
 
 
 // welcome page
-Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
     //Dashboards
     Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:Admin')->name('Admin.dashboard');
     Route::get('/labmanager/dashboard', fn() => view('dashboards.labmanager'))->middleware('role:Lab_Manager')->name('Lab_Manager.dashboard');
     Route::get('/pi/dashboard', [PiController::class, 'dashboard'])->middleware('role:PI')->name('PI.dashboard');
     Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware('role:Auditor');
+    Route::get('/researcher/dashboard', [ResearcherController::class, 'dashboard'])->name('Researcher.dashboard')->middleware('role:Researcher');
 
     //Functions    
     Route::post('/logout', [Logout::class, '__invoke'])->name('logout');
@@ -47,6 +50,9 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Researcher'])->group(function () {
-    Route::get('/equipment/{id}/book',  [ReservationController::class, 'create'])->name('equipment.book');
+    Route::get('/equipment/{id}/book',  [ReservationController::class, 'reservationPanel'])->name('equipment.book');
     Route::post('/equipment/{id}/book', [ReservationController::class, 'store'])->name('equipment.book.store');
+    Route::patch('/researcher/dashboard/sessions/{id}/checkout', [EquipmentSessionController::class, 'endSessionForCheckout'])->name('researcher.session.checkout');
+
+    Route::post('/equipment/{equipment}/session/start', [EquipmentSessionController::class, 'storeSessionForStartNow'])->name('equipment.session.start');
 });

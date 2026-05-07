@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LabManager Terminal | LabSync</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #0b0c0f;
@@ -64,8 +66,17 @@
             margin: 0;
         }
 
-        h1 { font-size: 3rem; font-weight: 800; margin: 0.5rem 0; text-transform: uppercase; }
-        h1 span { color: var(--muted); font-weight: 400; }
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            text-transform: uppercase;
+        }
+
+        h1 span {
+            color: var(--muted);
+            font-weight: 400;
+        }
 
         section {
             background: var(--surface);
@@ -104,9 +115,14 @@
             transition: border-color 0.3s;
         }
 
-        .terminal-input-group:focus-within { border-color: var(--amber); }
+        .terminal-input-group:focus-within {
+            border-color: var(--amber);
+        }
 
-        .field-core { flex: 1; padding: 12px 16px; }
+        .field-core {
+            flex: 1;
+            padding: 12px 16px;
+        }
 
         .field-core label {
             display: block;
@@ -143,11 +159,21 @@
             font-size: 0.8rem;
         }
 
-        .btn-terminate:hover { background: var(--red); color: #fff; }
+        .btn-terminate:hover {
+            background: var(--red);
+            color: #fff;
+        }
 
         /* ── Grid Layout ── */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .full-width { grid-column: span 2; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
 
         .form-group label {
             display: block;
@@ -169,10 +195,17 @@
             outline: none;
         }
 
-        .standard-input:focus { border-color: var(--amber); }
+        .standard-input:focus {
+            border-color: var(--amber);
+        }
 
         /* ── Styled Status Radios ── */
-        .status-container { display: flex; gap: 20px; margin-bottom: 1.5rem; }
+        .status-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 1.5rem;
+        }
+
         .status-option {
             display: flex;
             align-items: center;
@@ -181,7 +214,10 @@
             font-size: 0.75rem;
             cursor: pointer;
         }
-        .status-option input { accent-color: var(--amber); }
+
+        .status-option input {
+            accent-color: var(--amber);
+        }
 
         .btn-submit {
             background: var(--amber);
@@ -198,7 +234,10 @@
             transition: 0.2s;
         }
 
-        .btn-submit:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-submit:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
 
         .alert-success {
             background: rgba(245, 166, 35, 0.1);
@@ -212,6 +251,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="shell">
@@ -235,7 +275,11 @@
                     </div>
                     <button type="submit" class="btn-terminate">
                         <span>REMOVE</span>
-                        <svg width="14" viewBox="0 0 448 512" fill="currentColor"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+                        <svg width="14" viewBox="0 0 448 512" fill="currentColor">
+                            <path
+                                d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </form>
@@ -256,27 +300,34 @@
                 <div class="form-group full-width" style="margin-bottom: 1.5rem;">
                     <label>Operational Status</label>
                     <div class="status-container">
-                        <label class="status-option"><input type="radio" name="equipment_status" value="Idle" required> Available</label>
-                        <label class="status-option"><input type="radio" name="equipment_status" value="Active" required> In Use</label>
-                        <label class="status-option"><input type="radio" name="equipment_status" value="Maintenance" required> Maintenance</label>
-                        <label class="status-option"><input type="radio" name="equipment_status" value="Locked" required> Maintenance</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Idle"
+                                required> Idle</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Active"
+                                required> Active</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Maintenance"
+                                required> Maintenance</label>
+                        <label class="status-option"><input type="radio" name="equipment_status" value="Locked"
+                                required> Locked</label>
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label>Asset Identity</label>
-                        <input type="text" name="equipment_name" class="standard-input" placeholder="e.g., Spectrometer X-10" required>
+                        <input type="text" name="equipment_name" class="standard-input"
+                            placeholder="e.g., Spectrometer X-10" required>
                     </div>
 
                     <div class="form-group">
                         <label>Hourly Credit Rate ($)</label>
-                        <input type="number" step="0.01" name="hourly_rate" class="standard-input" placeholder="200.50" required>
+                        <input type="number" step="0.01" name="hourly_rate" class="standard-input"
+                            placeholder="200.50" required>
                     </div>
 
                     <div class="form-group">
                         <label>Required Clearance Level</label>
-                        <input type="number" name="required_clearance" class="standard-input" min="0" max="3" required>
+                        <input type="number" name="required_clearance" class="standard-input" min="0"
+                            max="3" required>
                     </div>
 
                     <div class="form-group">
@@ -291,12 +342,18 @@
 
                     <div class="form-group">
                         <label>Calibration Threshold (Hrs)</label>
-                        <input type="number" step="0.1" name="calibration_threshold" class="standard-input" placeholder="500" required>
+                        <input type="number" step="0.1" name="calibration_threshold" class="standard-input"
+                            placeholder="500" required>
                     </div>
 
                     <div class="form-group">
                         <label>Cooldown Buffer (Min)</label>
                         <input type="number" name="cooldown_buffer" class="standard-input" placeholder="15" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" class="standard-input" placeholder="2" min="1"
+                            required>
                     </div>
                 </div>
 
@@ -306,4 +363,5 @@
     </div>
 
 </body>
+
 </html>

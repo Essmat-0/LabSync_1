@@ -410,6 +410,104 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border-color: var(--text);
 }
 
+.option-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.option-card {
+    background: var(--surface);
+    /* match your existing --surface var */
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1.6rem 1.4rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    font-family: var(--mono);
+}
+
+.option-card:hover {
+    border-color: var(--border-lit, #2e3040);
+}
+
+.option-card--active {
+    border-color: var(--accent);
+    /* your existing --accent (lime/blue) */
+    background: rgba(77, 158, 255, 0.04);
+}
+
+.option-icon {
+    font-size: 1.4rem;
+    margin-bottom: .7rem;
+    color: var(--accent);
+}
+
+.option-label {
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: .4rem;
+}
+
+.option-desc {
+    font-size: .68rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* ── Instant Session Info Table ── */
+.instant-info {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    margin-bottom: 1.2rem;
+}
+
+.instant-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: .78rem;
+    padding: .55rem .8rem;
+    background: var(--surface-2, #0b0c0f);
+    border-radius: 4px;
+}
+
+.instant-key {
+    color: var(--muted);
+}
+
+.instant-val {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.instant-val.accent {
+    color: var(--accent);
+}
+
+.instant-val.muted {
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* ── Accent variant for the Start Now submit button ── */
+.btn-submit--accent {
+    background: var(--accent, #c8f04a);
+    color: #0b0c0f;
+    /* dark text on lime bg */
+}
+
+.btn-submit--accent:hover {
+    filter: brightness(1.08);
+}
+
 @keyframes up {
     from {
         opacity: 0;

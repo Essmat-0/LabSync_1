@@ -1,4 +1,3 @@
-{{-- resources/views/equipment/index.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,609 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Equipment Registry</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
+
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
         rel="stylesheet">
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0b0c0f;
-            --surface: #111318;
-            --border: #1e2028;
-            --border-lit: #2e3140;
-            --text: #e8eaf0;
-            --muted: #5a5e72;
-            --accent: #c8f04a;
-            /* electric lime */
-            --accent-dim: rgba(200, 240, 74, .12);
-            --red: #ff4d5a;
-            --amber: #f5a623;
-            --green: #3ddc84;
-            --blue: #4d9eff;
-            --font-head: 'Syne', sans-serif;
-            --font-mono: 'DM Mono', monospace;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-head);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ── noise grain overlay ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ── layout ── */
-        .shell {
-            position: relative;
-            z-index: 1;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 2rem 6rem;
-        }
-
-        /* ── header ── */
-        header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            padding: 3rem 0 2.5rem;
-            border-bottom: 1px solid var(--border);
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .header-left {
-            flex: 1;
-            min-width: 240px;
-        }
-
-        .eyebrow {
-            font-family: var(--font-mono);
-            font-size: .7rem;
-            letter-spacing: .18em;
-            color: var(--accent);
-            text-transform: uppercase;
-            margin-bottom: .6rem;
-        }
-
-        h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
-            font-weight: 800;
-            letter-spacing: -.03em;
-            line-height: 1;
-        }
-
-        h1 span {
-            color: var(--accent);
-        }
-
-        .header-meta {
-            font-family: var(--font-mono);
-            font-size: .72rem;
-            color: var(--muted);
-            margin-top: .8rem;
-        }
-
-        /* ── top-right controls ── */
-        .controls {
-            display: flex;
-            gap: .75rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-wrap {
-            position: relative;
-        }
-
-        .search-wrap svg {
-            position: absolute;
-            left: .85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--muted);
-            pointer-events: none;
-        }
-
-        .search-input {
-            background: var(--surface);
-            border: 1px solid var(--border-lit);
-            border-radius: 6px;
-            color: var(--text);
-            font-family: var(--font-mono);
-            font-size: .8rem;
-            padding: .6rem .9rem .6rem 2.4rem;
-            width: 220px;
-            outline: none;
-            transition: border-color .2s;
-        }
-
-        .search-input::placeholder {
-            color: var(--muted);
-        }
-
-        .search-input:focus {
-            border-color: var(--accent);
-        }
-
-        .filter-select {
-            background: var(--surface);
-            border: 1px solid var(--border-lit);
-            border-radius: 6px;
-            color: var(--text);
-            font-family: var(--font-mono);
-            font-size: .8rem;
-            padding: .6rem .9rem;
-            outline: none;
-            cursor: pointer;
-            transition: border-color .2s;
-        }
-
-        .filter-select:focus {
-            border-color: var(--accent);
-        }
-
-        /* ── stats bar ── */
-        .stats-bar {
-            display: flex;
-            gap: 1px;
-            margin: 2.5rem 0;
-            background: var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .stat {
-            flex: 1;
-            background: var(--surface);
-            padding: 1.2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: .3rem;
-        }
-
-        .stat-label {
-            font-family: var(--font-mono);
-            font-size: .65rem;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -.03em;
-        }
-
-        /* ── grid ── */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        /* ── card ── */
-        .card {
-            background: var(--surface);
-            padding: 1.8rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            transition: background .2s;
-            cursor: default;
-            animation: fadeUp .5s both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card:hover {
-            background: #161820;
-        }
-
-        /* stagger */
-        .card:nth-child(1) {
-            animation-delay: .05s;
-        }
-
-        .card:nth-child(2) {
-            animation-delay: .10s;
-        }
-
-        .card:nth-child(3) {
-            animation-delay: .15s;
-        }
-
-        .card:nth-child(4) {
-            animation-delay: .20s;
-        }
-
-        .card:nth-child(5) {
-            animation-delay: .25s;
-        }
-
-        .card:nth-child(6) {
-            animation-delay: .30s;
-        }
-
-        /* card top row */
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .card-id {
-            font-family: var(--font-mono);
-            font-size: .65rem;
-            color: var(--muted);
-            letter-spacing: .1em;
-        }
-
-        /* status badge */
-        .badge {
-            font-family: var(--font-mono);
-            font-size: .65rem;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            padding: .28rem .65rem;
-            border-radius: 4px;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-        }
-
-        .badge::before {
-            content: '';
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: currentColor;
-            display: block;
-        }
-
-        .badge-idle {
-            color: var(--green);
-            background: rgba(61, 220, 132, .1);
-        }
-
-        .badge-active {
-            color: var(--blue);
-            background: rgba(77, 158, 255, .1);
-        }
-
-        .badge-maintenance {
-            color: var(--amber);
-            background: rgba(245, 166, 35, .1);
-        }
-
-        .badge-locked {
-            color: var(--red);
-            background: rgba(255, 77, 90, .1);
-        }
-
-        /* card name */
-        .card-name {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -.02em;
-            line-height: 1.2;
-        }
-
-        /* divider */
-        .card-divider {
-            height: 1px;
-            background: var(--border);
-        }
-
-        /* meta rows */
-        .meta-list {
-            display: flex;
-            flex-direction: column;
-            gap: .55rem;
-        }
-
-        .meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: var(--font-mono);
-            font-size: .75rem;
-        }
-
-        .meta-key {
-            color: var(--muted);
-        }
-
-        .meta-val {
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .meta-val.accent {
-            color: var(--accent);
-        }
-
-        /* clearance pips */
-        .pips {
-            display: flex;
-            gap: 4px;
-        }
-
-        .pip {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            background: var(--border-lit);
-        }
-
-        .pip.on {
-            background: var(--accent);
-        }
-
-        /* card footer */
-        .card-footer {
-            display: flex;
-            gap: .6rem;
-            margin-top: auto;
-        }
-
-        .btn {
-            flex: 1;
-            font-family: var(--font-mono);
-            font-size: .72rem;
-            letter-spacing: .05em;
-            padding: .6rem .5rem;
-            border-radius: 5px;
-            border: 1px solid transparent;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            transition: all .15s;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: #0b0c0f;
-            font-weight: 600;
-            border-color: var(--accent);
-        }
-
-        .btn-primary:hover {
-            filter: brightness(1.1);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--muted);
-            border-color: var(--border-lit);
-        }
-
-        .btn-ghost:hover {
-            color: var(--text);
-            border-color: var(--text);
-        }
-
-        .btn:disabled,
-        .btn-primary.disabled {
-            opacity: .35;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        /* ── empty state ── */
-        .empty {
-            grid-column: 1 / -1;
-            background: var(--surface);
-            padding: 5rem 2rem;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .empty-icon {
-            font-size: 2.5rem;
-            filter: grayscale(1);
-            opacity: .4;
-        }
-
-        .empty-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .empty-sub {
-            font-family: var(--font-mono);
-            font-size: .78rem;
-            color: var(--muted);
-        }
-
-        /* ── pagination ── */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: .5rem;
-            margin-top: 2.5rem;
-            font-family: var(--font-mono);
-            font-size: .78rem;
-        }
-
-        .pagination a,
-        .pagination span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 2rem;
-            height: 2rem;
-            padding: 0 .5rem;
-            border-radius: 5px;
-            border: 1px solid var(--border-lit);
-            color: var(--muted);
-            text-decoration: none;
-            transition: all .15s;
-        }
-
-        .pagination a:hover {
-            color: var(--text);
-            border-color: var(--text);
-        }
-
-        .pagination .active {
-            background: var(--accent);
-            color: #0b0c0f;
-            border-color: var(--accent);
-            font-weight: 600;
-        }
-
-        .pagination .disabled {
-            opacity: .3;
-            pointer-events: none;
-        }
-
-        /* ── no-results (js) ── */
-        #no-results {
-            display: none;
-            grid-column: 1 / -1;
-            padding: 4rem;
-            text-align: center;
-            background: var(--surface);
-            font-family: var(--font-mono);
-            color: var(--muted);
-            font-size: .85rem;
-        }
-
-        @media (max-width: 640px) {
-            .stats-bar {
-                flex-direction: column;
-                gap: 1px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .search-input {
-                width: 100%;
-            }
-        }
-
-        /* Layout helper for the top row */
-        /* Layout helper for the top row */
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            /* Changed from flex-end to center for better vertical leveling */
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-left h1 {
-            line-height: 1;
-            /* Prevents hidden descender space from pushing the baseline */
-            margin: 4px 0;
-        }
-
-        /* Container for the two terminal buttons */
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            height: 38px;
-            /* Matches the fixed height of the buttons */
-        }
-
-        .terminal-dashboard-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            padding: 0 1.2rem;
-            /* Vertical padding removed to rely on height + flex center */
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 4px;
-            text-decoration: none;
-            height: 38px;
-            box-sizing: border-box;
-        }
-
-        .terminal-dashboard-btn .btn-prompt {
-            font-family: var(--font-mono);
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .terminal-dashboard-btn .btn-text {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            color: var(--muted);
-        }
-
-        .terminal-dashboard-btn:hover {
-            border-color: var(--accent);
-            background: rgba(200, 240, 74, 0.05);
-        }
-
-        .terminal-dashboard-btn:hover .btn-text {
-            color: var(--text);
-        }
-
-        .alert {
-            background: rgba(200, 240, 74, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 1rem;
-            margin-bottom: 2rem;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 
 <body>
@@ -630,12 +31,10 @@
 
                 <div class="header-actions">
                     @auth
-                        @if (!auth()->user()->isResearcher())
-                            <a href="{{ route(auth()->user()->role->name . '.dashboard') }}" class="terminal-dashboard-btn">
-                                <span class="btn-prompt">></span>
-                                <span class="btn-text">{{ strtoupper(auth()->user()->role->name) }}</span>
-                            </a>
-                        @endif
+                        <a href="{{ route(auth()->user()->role->name . '.dashboard') }}" class="terminal-dashboard-btn">
+                            <span class="btn-prompt">></span>
+                            <span class="btn-text">{{ strtoupper(auth()->user()->role->name) }} Dashboard</span>
+                        </a>
                         <x-logout-welcome />
                     @endauth
                 </div>
@@ -662,20 +61,31 @@
                 {{-- Status filter --}}
                 <select id="status-filter" class="filter-select">
                     <option value="">All statuses</option>
-                    <option value="Available">Available</option>
-                    <option value="In Use">In Use</option>
+                    <option value="Idle">Idle</option>
+                    <option value="Active">Active</option>
                     <option value="Maintenance">Maintenance</option>
-                    <option value="Unavailable">Unavailable</option>
+                    <option value="Locked">Unavailable</option>
+                </select>
+
+                <select id="category-filter" class="filter-select">
+                    <option value="">All Categories</option>
+                    @foreach ($equipment->pluck('category.name')->unique() as $categoryName)
+                        <option value="{{ strtolower($categoryName) }}">{{ $categoryName }}</option>
+                    @endforeach
                 </select>
             </div>
         </header>
         {{-- ── Stats bar ── --}}
         @php
+
             $total = $equipment->total();
             $idle = $equipment->getCollection()->where('status', 'Idle')->count();
             $active = $equipment->getCollection()->where('status', 'Active')->count();
             $maintenance = $equipment->getCollection()->where('status', 'Maintenance')->count();
             $locked = $equipment->getCollection()->where('status', 'Locked')->count();
+            $isResearcher = auth()->user()->isResearcher();
+            $researcherProfile = auth()->user()->researcherProfile;
+
         @endphp
 
         <div class="stats-bar">
@@ -705,83 +115,79 @@
         <div class="grid" id="equipment-grid">
 
             @forelse ($equipment as $item)
+                @if (!$isResearcher || $researcherProfile->canAccess($item))
+                    @php
+                        $badgeClass = match ($item->status) {
+                            'Idle' => 'badge-idle',
+                            'Active' => 'badge-active',
+                            'Maintenance' => 'badge-maintenance',
+                            'Locked' => 'badge-locked',
+                            default => 'badge-unavailable',
+                        };
+                        $category = $item->category->name ?? 'No Category';
+                        $canBook = $item->status === 'Idle' || $item->status === 'Active';
+                    @endphp
 
-                @php
-                    $badgeClass = match ($item->status) {
-                        'Idle' => 'badge-idle',
-                        'Active' => 'badge-active',
-                        'Maintenance' => 'badge-maintenance',
-                        'Locked' => 'badge-locked',
-                        default => 'badge-unavailable',
-                    };
-                    $category = $item->category->name ?? 'No Category';
-                    $canBook =
-                        $item->status === 'Idle' &&
-                        auth()->user()?->clearance_level >= $item->required_clearance &&
-                        auth()->user()->isResearcher();
-                        
-                @endphp
-
-                <div class="card" data-name="{{ strtolower($item->name) }}" data-status="{{ $item->status }}">
-                    {{-- Top row --}}
-                    <div class="card-top">
-                        <span class="card-id">#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
-                        <span class="badge {{ $badgeClass }}">{{ $item->status }}</span>
-                    </div>
-
-                    {{-- Name --}}
-                    <div class="card-name">{{ $item->name }}</div>
-
-                    <div class="card-divider"></div>
-
-                    {{-- Meta --}}
-                    <div class="meta-list">
-                        <div class="meta-row">
-                            <span class="meta-key">Category</span>
-                            <span class="meta-val accent">{{ $category }}</span>
+                    <div class="card" data-name="{{ strtolower($item->name) }}" data-status="{{ $item->status }}"
+                        data-category="{{ strtolower($item->category->name ?? 'uncategorized') }}">
+                        {{-- Top row --}}
+                        <div class="card-top">
+                            <span class="card-id">#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
+                            <span class="badge {{ $badgeClass }}">{{ $item->status }}</span>
                         </div>
-                        <div class="meta-row">
-                            <span class="meta-key">Hourly Rate</span>
-                            <span class="meta-val accent">${{ number_format($item->hourly_rate, 2) }}/hr</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-key">Clearance Req.</span>
-                            <div class="pips">
-                                @for ($i = 1; $i <= 3; $i++)
-                                    <div class="pip {{ $i <= $item->required_clearance ? 'on' : '' }}">
-                                    </div>
-                                @endfor
+
+                        {{-- Name --}}
+                        <div class="card-name">{{ $item->name }}</div>
+
+                        <div class="card-divider"></div>
+
+                        {{-- Meta --}}
+                        <div class="meta-list">
+                            <div class="meta-row">
+                                <span class="meta-key">Category</span>
+                                <span class="meta-val accent">{{ $category }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-key">Hourly Rate</span>
+                                <span class="meta-val accent">${{ number_format($item->hourly_rate, 2) }}/hr</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-key">Clearance Req.</span>
+                                <div class="pips">
+                                    @for ($i = 1; $i <= 3; $i++)
+                                        <div class="pip {{ $i <= $item->required_clearance ? 'on' : '' }}">
+                                        </div>
+                                    @endfor
+                                </div>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-key">Added</span>
+                                <span class="meta-val">{{ $item->created_at->format('d M Y') }}</span>
                             </div>
                         </div>
-                        <div class="meta-row">
-                            <span class="meta-key">Added</span>
-                            <span class="meta-val">{{ $item->created_at->format('d M Y') }}</span>
+
+                        <div class="card-divider"></div>
+
+                        {{-- Footer actions --}}
+                        <div class="card-footer">
+                            <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
+                                View Details
+                            </a>
+
+                            @auth
+                                @if ($canBook)
+                                    <a href="{{ route('equipment.book', $item->id) }}" class="btn btn-primary">
+                                        Book Session
+                                    </a>
+                                @else
+                                    <span class="btn btn-primary disabled">
+                                        {{ auth()->user()->isResearcher() ? ($item->status !== 'Idle' ? 'Unavailable' : 'No Clearance') : 'You aren\'t authorized to Book' }}
+                                    </span>
+                                @endif
+                            @endauth
                         </div>
                     </div>
-
-                    <div class="card-divider"></div>
-
-                    {{-- Footer actions --}}
-                    <div class="card-footer">
-                        <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
-                            View Details
-                        </a>
-
-                        @auth
-                            @if ($canBook)
-                                <a href="{{ route('equipment.book', $item->id) }}" class="btn btn-primary">
-                                    Book Session
-                                </a>
-                            @else
-                                <span class="btn btn-primary disabled"
-                                    title="{{ $item->status !== 'Idle' ? 'Equipment unavailable' : 'Insufficient clearance' }}">
-                                    {{ auth()->user()->isResearcher() ? ($item->status !== 'Idle' ? 'Unavailable' : 'No Clearance') : 'You aren\'t authorized to Book' }}
-                                </span>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-
+                @endif
             @empty
 
                 <div class="empty">
@@ -789,7 +195,6 @@
                     <div class="empty-title">No equipment found</div>
                     <p class="empty-sub">No equipment has been registered yet.</p>
                 </div>
-
             @endforelse
 
             <div id="no-results">No equipment matches your search.</div>
@@ -829,18 +234,24 @@
     <script>
         const searchInput = document.getElementById('search');
         const statusFilter = document.getElementById('status-filter');
+        const categoryFilter = document.getElementById('category-filter'); // 1. Grab the new filter
         const cards = document.querySelectorAll('.card[data-name]');
         const noResults = document.getElementById('no-results');
 
         function filterCards() {
             const query = searchInput.value.toLowerCase().trim();
             const status = statusFilter.value.toLowerCase();
+            const category = categoryFilter.value.toLowerCase(); // 2. Get the selected category
             let visible = 0;
 
             cards.forEach(card => {
                 const nameMatch = card.dataset.name.includes(query);
                 const statusMatch = !status || card.dataset.status.toLowerCase() === status;
-                const show = nameMatch && statusMatch;
+
+                // 3. Match against the category data attribute
+                const categoryMatch = !category || card.dataset.category.toLowerCase() === category;
+
+                const show = nameMatch && statusMatch && categoryMatch;
 
                 card.style.display = show ? '' : 'none';
                 if (show) visible++;
@@ -851,6 +262,7 @@
 
         searchInput.addEventListener('input', filterCards);
         statusFilter.addEventListener('change', filterCards);
+        categoryFilter.addEventListener('change', filterCards); // 4. Listen for changes
     </script>
 
 </body>

@@ -55,14 +55,14 @@ class PiService
     public function approve(Reservation $reservation, float $cost): void
     {
         $pi = auth()->user()->piProfile;
-
         if ($cost > $pi->budget_limit) {
             throw new \Exception("Budget exceeded");
         }
-        $budgetNew = $pi->budget_limit - $cost;
-        $pi->update(['budget_limit' => $budgetNew]);
-
-        $reservation->update(['status' => 'Approved']);
+        $grantService = app(GrantService::class);
+        if ($grantService->checkBalance($cost)) {
+            $grantService->addSession($reservation);
+            $reservation->update(['status' => 'Approved']);
+        }
     }
 
     public function reject(Reservation $reservation): void

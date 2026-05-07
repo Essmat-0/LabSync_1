@@ -25,7 +25,8 @@ class Equipment extends Model
         'total_usage_hours',
         'location_code',
         'calibration_threshold',
-        'cooldown_buffer'
+        'cooldown_buffer',
+        'quantity',
     ];
 
 

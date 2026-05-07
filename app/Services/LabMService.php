@@ -23,6 +23,7 @@ class LabMService
             'total_usage_hours' => Equipment::totalUsageHours(),
             'calibration_threshold' => $data['calibration_threshold'],
             'cooldown_buffer' => $data['cooldown_buffer'],
+            'quantity' => $data['quantity'],
         ];
 
         return  Equipment::updateOrCreate(['name' => $data['equipment_name']], $values);
@@ -31,5 +32,9 @@ class LabMService
     public function deleteEquipment($id)
     {
         return  Equipment::where('id', $id)->firstOrFail()->delete();
+    }
+
+    public function sayHiService(){
+        return 'hi';
     }
 }

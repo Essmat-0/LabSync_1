@@ -57,10 +57,12 @@ class PiController extends Controller
         }
 
         $cost = $this->reservationService->calculateCost($reservation);
+        if($this->piService->approve($reservation, $cost)){
+            return redirect()->route('PI.dashboard', ['tab' => 'pending'])->with('success', "Reservation #{$reservation->id} approved.");
+        }else{
+            
+        }
 
-
-        $this->piService->approve($reservation, $cost);
-        return redirect()->route('PI.dashboard', ['tab' => 'pending'])->with('success', "Reservation #{$reservation->id} approved.");
     }
 
     public function reject(Reservation $reservation)

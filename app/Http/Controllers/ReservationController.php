@@ -15,7 +15,7 @@ class ReservationController extends Controller
         $this->reservationService = $reservationService;
     }
 
-    public function create($id)
+    public function reservationPanel($id)
     {
         $equipment = Equipment::findOrFail($id);
         return view('equipment.book', compact('equipment'));
@@ -39,9 +39,7 @@ class ReservationController extends Controller
 
         // 3. Call the service
         $this->reservationService->makeReservation($data);
-        $sessionController = app(EquipmentSessionController::class);
-        $sessionController->storeSessionTime($request);
-        return redirect()->route('equipment.index')
-            ->with('success', 'Reservation submitted and pending approval.');
+       
+        return redirect()->route('equipment.index')->with('success', 'Reservation submitted and pending approval.');
     }
 }

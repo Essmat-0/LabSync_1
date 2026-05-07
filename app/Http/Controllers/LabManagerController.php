@@ -27,6 +27,7 @@ class LabManagerController extends Controller
             'location_code' => 'required|string',
             'calibration_threshold' => 'required|numeric',
             'cooldown_buffer' => 'required|integer',
+            'quantity' =>   'required|integer',
         ];
         $validated = $request->validate($rules);
 
@@ -45,4 +46,5 @@ class LabManagerController extends Controller
         $this->labService->deleteEquipment($request->equipment_id);
         return "Deleted Equipment with ID: " . $id;
     }
+
 }

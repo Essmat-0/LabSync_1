@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,17 +12,16 @@
 
     @php
         $badgeClass = match ($equipment->status) {
-            'Idle' => 'badge-available',
-            'Active' => 'badge-in-use',
+            'Idle'        => 'badge-available',
+            'Active'      => 'badge-in-use',
             'Maintenance' => 'badge-maintenance',
-            'Locked' => 'badge-locked',
-            default => 'badge-unavailable',
+            'Locked'      => 'badge-locked',
+            default       => 'badge-unavailable',
         };
 
-        $canBook =
-            $equipment->status === 'Idle' &&
-            auth()->check() &&
-            auth()->user()->clearance_level >= $equipment->required_clearance;
+        $isIdle          = $equipment->status === 'Idle';
+        $hasClearance    = auth()->user()->clearance_level >= $equipment->required_clearance;
+        $canInteract     = $isIdle && $hasClearance;
     @endphp
 
     <div class="shell">
@@ -49,8 +47,7 @@
         </div>
 
         {{-- ── Blocked: not available ── --}}
-        @if ($equipment->status !== 'Idle')
-
+        @if (!$isIdle)
             <div class="blocked-card">
                 <div class="blocked-title">Equipment Unavailable</div>
                 <p class="blocked-msg">
@@ -61,8 +58,8 @@
                 <a href="{{ route('equipment.show', $equipment->id) }}" class="btn-back">← Back to Details</a>
             </div>
 
-            {{-- ── Blocked: insufficient clearance ── --}}
-        @elseif (auth()->user()->clearance_level < $equipment->required_clearance)
+        {{-- ── Blocked: insufficient clearance ── --}}
+        @elseif (!$hasClearance)
             <div class="blocked-card">
                 <div class="blocked-title">Insufficient Clearance</div>
                 <p class="blocked-msg">
@@ -73,8 +70,9 @@
                 <a href="{{ route('equipment.show', $equipment->id) }}" class="btn-back">← Back to Details</a>
             </div>
 
-            {{-- ── Booking form ── --}}
+        {{-- ── Available: show both options ── --}}
         @else
+
             {{-- Validation errors --}}
             @if ($errors->any())
                 <div class="alert-error">
@@ -86,95 +84,198 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('equipment.book.store', $equipment->id) }}">
-                @csrf
+            {{-- ── Option Picker ── --}}
+            <div class="option-row">
 
-                <div class="form-card">
-                    <div class="form-card-header">Reservation Details</div>
-                    <div class="form-body">
+                {{-- Option A: Start Now --}}
+                <button class="option-card option-card--active" id="opt-now" onclick="switchMode('now')">
+                    <div class="option-icon">▶</div>
+                    <div class="option-label">Start Now</div>
+                    <div class="option-desc">Begin a session immediately.<br>Check out when done to stop billing.</div>
+                </button>
 
-                        {{-- Time range --}}
-                        <div class="field-row">
-                            <div class="field">
-                                <label for="start_time">Start Time</label>
-                                <input type="datetime-local" id="start_time" name="start_time"
-                                    value="{{ old('start_time') }}" min="{{ now()->format('Y-m-d\TH:i') }}"
-                                    required />
+                {{-- Option B: Reserve --}}
+                <button class="option-card" id="opt-reserve" onclick="switchMode('reserve')">
+                    <div class="option-icon">◷</div>
+                    <div class="option-label">Schedule Reservation</div>
+                    <div class="option-desc">Book a future time window.<br>Requires PI approval before the session.</div>
+                </button>
+
+            </div>
+
+            {{-- ══════════════════════════
+                 PANEL A — Start Now
+                 Only start_time = now() is stored server-side.
+                 end_time is null until researcher checks out.
+                 Billing: (checkout_time - start_time) × hourly_rate
+            ══════════════════════════ --}}
+            <div id="panel-now">
+                <form method="POST" action="{{ route('equipment.session.start', $equipment->id) }}">
+                    @csrf
+
+                    <div class="form-card">
+                        <div class="form-card-header">Immediate Session</div>
+                        <div class="form-body">
+
+                            <div class="instant-info">
+                                <div class="instant-row">
+                                    <span class="instant-key">Equipment</span>
+                                    <span class="instant-val">{{ $equipment->name }}</span>
+                                </div>
+                                <div class="instant-row">
+                                    <span class="instant-key">Start Time</span>
+                                    <span class="instant-val" id="live-clock">—</span>
+                                </div>
+                                <div class="instant-row">
+                                    <span class="instant-key">Rate</span>
+                                    <span class="instant-val accent">${{ number_format($equipment->hourly_rate, 2) }}/hr</span>
+                                </div>
+                                <div class="instant-row">
+                                    <span class="instant-key">End Time</span>
+                                    <span class="instant-val muted">Recorded on checkout</span>
+                                </div>
                             </div>
-                            <div class="field">
-                                <label for="end_time">End Time</label>
-                                <input type="datetime-local" id="end_time" name="end_time"
-                                    value="{{ old('end_time') }}" min="{{ now()->addHour()->format('Y-m-d\TH:i') }}"
-                                    required />
+
+                            <div class="divider"></div>
+
+                            <div class="status-note">
+                                The session starts immediately. A <strong style="color:var(--text)">Check Out</strong>
+                                button will appear on your dashboard — clicking it records the end time and finalises your bill.
                             </div>
+
+                            <button type="submit" class="btn-submit btn-submit--accent">Start Session Now →</button>
+
                         </div>
-
-                        {{-- Cost preview (live-calculated via JS) --}}
-                        <div class="cost-preview">
-                            <div class="cost-left">
-                                <span class="cost-label">Estimated Cost</span>
-                                <span class="cost-value" id="cost-display">—</span>
-                                <span class="cost-breakdown" id="cost-breakdown">Select start and end time</span>
-                            </div>
-                            <div
-                                style="font-family:var(--mono); font-size:.68rem; color:var(--muted); text-align:right; line-height:1.6;">
-                                Rate<br>
-                                <span
-                                    style="color:var(--accent); font-size:.82rem;">${{ number_format($equipment->hourly_rate, 2) }}/hr</span>
-                            </div>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        {{-- Status note --}}
-                        <div
-                            style="font-family:var(--mono); font-size:.7rem; color:var(--muted); line-height:1.6; padding:.8rem; background:var(--surface-2); border-radius:5px; border-left:2px solid var(--border-lit);">
-                            Reservations are submitted with <strong style="color:var(--text)">Pending</strong> status
-                            and require approval before the session begins.
-                        </div>
-
-                        <button type="submit" class="btn-submit">Submit Reservation →</button>
-
                     </div>
-                </div>
 
-            </form>
+                </form>
+            </div>
+
+            {{-- ══════════════════════════
+                 PANEL B — Schedule Reservation
+                 Both start_time and end_time are stored.
+                 Status = pending until PI approves.
+            ══════════════════════════ --}}
+            <div id="panel-reserve" style="display:none;">
+                <form method="POST" action="{{ route('equipment.book.store', $equipment->id) }}">
+                    @csrf
+
+                    <div class="form-card">
+                        <div class="form-card-header">Reservation Details</div>
+                        <div class="form-body">
+
+                            <div class="field-row">
+                                <div class="field">
+                                    <label for="start_time">Start Time</label>
+                                    <input type="datetime-local" id="start_time" name="start_time"
+                                        value="{{ old('start_time') }}"
+                                        min="{{ now()->format('Y-m-d\TH:i') }}" required />
+                                </div>
+                                <div class="field">
+                                    <label for="end_time">End Time</label>
+                                    <input type="datetime-local" id="end_time" name="end_time"
+                                        value="{{ old('end_time') }}"
+                                        min="{{ now()->addHour()->format('Y-m-d\TH:i') }}" required />
+                                </div>
+                                <div class="field">
+                                    <label for="quantity">Quantity</label>
+                                    <input type="number" id="quantity" name="quantity"
+                                        min="1" max="{{ $equipment->quantity - 1 }}" required />
+                                </div>
+                            </div>
+
+                            {{-- Live cost preview --}}
+                            <div class="cost-preview">
+                                <div class="cost-left">
+                                    <span class="cost-label">Estimated Cost</span>
+                                    <span class="cost-value" id="cost-display">—</span>
+                                    <span class="cost-breakdown" id="cost-breakdown">Select start and end time</span>
+                                </div>
+                                <div style="font-family:var(--mono); font-size:.68rem; color:var(--muted); text-align:right; line-height:1.6;">
+                                    Rate<br>
+                                    <span style="color:var(--accent); font-size:.82rem;">${{ number_format($equipment->hourly_rate, 2) }}/hr</span>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="status-note">
+                                Reservations are submitted with <strong style="color:var(--text)">Pending</strong> status
+                                and require PI approval before the session begins.
+                            </div>
+
+                            <button type="submit" class="btn-submit">Submit Reservation →</button>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
 
         @endif
 
     </div>{{-- /shell --}}
 
     <script>
+        /* ── Mode switcher ── */
+        function switchMode(mode) {
+            const isNow = mode === 'now';
+
+            document.getElementById('panel-now').style.display    = isNow ? 'block' : 'none';
+            document.getElementById('panel-reserve').style.display = isNow ? 'none'  : 'block';
+
+            document.getElementById('opt-now').classList.toggle('option-card--active', isNow);
+            document.getElementById('opt-reserve').classList.toggle('option-card--active', !isNow);
+        }
+
+        /* ── Live clock for the "Start Now" panel ── */
+        function updateClock() {
+            const el = document.getElementById('live-clock');
+            if (!el) return;
+            const now = new Date();
+            el.textContent = now.toLocaleString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        /* ── Cost preview for the reservation panel ── */
         const ratePerHour = {{ $equipment->hourly_rate }};
-        const startInput = document.getElementById('start_time');
-        const endInput = document.getElementById('end_time');
+        const startInput  = document.getElementById('start_time');
+        const endInput    = document.getElementById('end_time');
         const costDisplay = document.getElementById('cost-display');
-        const breakdown = document.getElementById('cost-breakdown');
+        const breakdown   = document.getElementById('cost-breakdown');
 
         function updateCost() {
+            if (!startInput || !endInput) return;
             const start = new Date(startInput.value);
-            const end = new Date(endInput.value);
+            const end   = new Date(endInput.value);
 
             if (!startInput.value || !endInput.value || end <= start) {
                 costDisplay.textContent = '—';
-                breakdown.textContent = end <= start && startInput.value && endInput.value ?
-                    'End time must be after start time' :
-                    'Select start and end time';
+                breakdown.textContent = (end <= start && startInput.value && endInput.value)
+                    ? 'End time must be after start time'
+                    : 'Select start and end time';
                 return;
             }
 
             const hours = (end - start) / 36e5;
-            const cost = hours * ratePerHour;
+            const cost  = hours * ratePerHour;
 
             costDisplay.textContent = '$' + cost.toFixed(2);
-            breakdown.textContent = hours.toFixed(1) + ' hr × $' + ratePerHour.toFixed(2) + '/hr';
-
-            // Keep end_time min in sync with start_time
+            breakdown.textContent   = hours.toFixed(1) + ' hr × $' + ratePerHour.toFixed(2) + '/hr';
             endInput.min = startInput.value;
         }
 
         startInput?.addEventListener('change', updateCost);
-        endInput?.addEventListener('change', updateCost);
+        endInput?.addEventListener('change',   updateCost);
+
+        // If validation failed on the reservation form, reopen that panel
+        @if ($errors->any())
+            switchMode('reserve');
+        @endif
     </script>
 
 </body>
