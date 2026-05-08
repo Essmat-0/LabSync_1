@@ -371,11 +371,8 @@
         @if (session('success'))
             <div class="alert-success">&gt; {{ session('success') }}</div>
         @endif
-        @if (session('BudgetExceeded'))
-            <div class="alert-success">&gt; {{ session('BudgetExceeded') }}</div>
-        @endif
-        @if (session('GrantFailed'))
-            <div class="alert-success">&gt; {{ session('GrantFailed') }}</div>
+        @if (session('fail'))
+            <div class="alert-success">&gt; {{ session('fail') }}</div>
         @endif
         @if (session('error'))
             <div class="alert-error">&gt; {{ session('error') }}</div>

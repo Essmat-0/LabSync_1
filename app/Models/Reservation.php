@@ -13,6 +13,7 @@ class Reservation extends Model
         'grant_id',
         'start_time',
         'end_time',
+        'quantity',
         'status',
     ];
 

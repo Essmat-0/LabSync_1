@@ -4,14 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Equipment;
 use App\Models\EquipmentSession;
+use App\Models\Grant;
+use App\Models\Reservation;
+use App\Services\GrantService;
 use App\Services\ReservationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EquipmentSessionController extends Controller
 {
-    public function storeSessionForReservation(array $request)
+    public function storeSessionForReservation(Reservation $reservation)
     {
+
+        $request = [
+            'user_id' => $reservation->user_id,
+            'equipment_id' => $reservation->equipment_id,
+            'start_time' => $reservation->start_time,
+            'end_time'   => $reservation->end_time,
+        ];
+
         return EquipmentSession::create([
             'user_id' => $request['user_id'],
             'equipment_id' => $request['equipment_id'],
@@ -30,6 +41,9 @@ class EquipmentSessionController extends Controller
             'user_id' => auth()->id(),
             'start_time' => now(),
         ]);
+        $equipment->update([
+            'status' => 'Active',
+        ]);
         return redirect()->route('Researcher.dashboard')->with('success', 'Session started!');
     }
 
@@ -42,12 +56,14 @@ class EquipmentSessionController extends Controller
             'end_time' => now(),
         ]);
 
+        $equipment = $session->equipment;
+
+        $equipment->update(['status' => 'Idle']);
 
         $durationInHours = $session->start_time->diffInMinutes($session->end_time) / 60;
         $Cost = $durationInHours * $session->equipment->hourly_rate;
-        
-        
+
         $session->update(['total_cost' => $durationInHours * $session->equipment->hourly_rate]);
-       return redirect()->route('Researcher.dashboard')->with('success', 'Session Ended!');
+        return redirect()->route('Researcher.dashboard')->with('success', 'Session Ended!');
     }
 }

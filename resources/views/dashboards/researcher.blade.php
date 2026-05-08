@@ -65,11 +65,7 @@
             </button>
         </div>
 
-        {{-- ══════════════════════════════════════
-             TAB 1 — My Reservations
-             Covers reservations the researcher submitted.
-             Each row shows equipment, time window, status (pending / approved / rejected).
-        ═══════════════════════════════════════ --}}
+        
         <div id="reservations-sec" class="tab-content active">
             <section>
                 <h2>My Reservations</h2>
@@ -106,13 +102,8 @@
             </section>
         </div>
 
-        {{-- ══════════════════════════════════════
-             TAB 2 — Active Sessions
-             A session starts when the researcher picks an Idle equipment and
-             clicks "Start Now". Only start_time is stored at that point.
-             end_time is recorded when the researcher checks out.
-             The bill is later calculated from (end_time - start_time).
-        ═══════════════════════════════════════ --}}
+       
+
         <div id="sessions-sec" class="tab-content">
             <section>
                 <h2>Active Sessions</h2>

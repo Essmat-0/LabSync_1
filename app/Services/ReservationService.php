@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Equipment;
 use App\Models\EquipmentSession;
 use App\Models\Reservation;
 use Carbon\Carbon;
@@ -18,9 +19,15 @@ class ReservationService
             'equipment_id' => $data['equipment_id'],
             'start_time'   => $data['start_time'],
             'end_time'     => $data['end_time'],
+            'quantity'     => $data['quantity'],
             'status'       => 'Pending',
         ]);
-        
+
+        $equipment = Equipment::findOrFail($data['equipment_id']);
+        $newQty = $equipment->quantity - $data['quantity'];
+        $equipment->update([
+            'quantity' => $newQty
+        ]);
         return $reservation;
     }
 

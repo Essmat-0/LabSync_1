@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Reservation;
+use App\Http\Controllers\EquipmentSessionController;
 use App\Models\Equipment;
-use App\Models\PiProfile;
+use App\Models\Reservation;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Hash;
 
 class PiService
 {
-
 
     public function StoreorUpdateResearcher(array $data)
     {
@@ -59,8 +58,9 @@ class PiService
             throw new \Exception("Budget exceeded");
         }
         $grantService = app(GrantService::class);
+        $session = app(EquipmentSessionController::class);
         if ($grantService->checkBalance($cost)) {
-            $grantService->addSession($reservation);
+            $session->storeSessionForReservation($reservation);
             $reservation->update(['status' => 'Approved']);
         }
     }
@@ -68,5 +68,10 @@ class PiService
     public function reject(Reservation $reservation): void
     {
         $reservation->update(['status' => 'Rejected']);
+        $equipment = Equipment::findOrFail($reservation->equipment_id);
+        $quantity = $equipment->quantity + $reservation->quantity;
+        $equipment->update([
+            'quantity' => $quantity,
+        ]);
     }
 }

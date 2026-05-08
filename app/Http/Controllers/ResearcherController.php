@@ -13,7 +13,7 @@ class ResearcherController extends Controller
     {
         $id = Auth::id();
         $reservations = Reservation::where('user_id', $id)->get();
-        $activeSessions = EquipmentSession::where('user_id', $id)->get();
+        $activeSessions = EquipmentSession::where('user_id', $id)->whereNull('end_time')->get();
         return view('dashboards.researcher', compact('reservations', 'activeSessions'));
     }
 }

@@ -246,6 +246,20 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
 }
 
+input[type="number"] {
+    background: var(--surface-2);
+    border: 1px solid var(--border-lit);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: .82rem;
+    padding: .7rem .9rem;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    width: 100%;
+    -webkit-appearance: none;
+}
+
 .select-wrap {
     position: relative;
 }

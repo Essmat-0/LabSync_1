@@ -20,16 +20,4 @@ class GrantService
         $grant->update(['balance' => $newBalance]);
         return true;
     }
-
-    public function addSession(Reservation $reservation)
-    {
-        $data = [
-            'user_id' => $reservation->user_id,
-            'equipment_id' => $reservation->equipment_id,
-            'start_time' => $reservation->start_time,
-            'end_time'   => $reservation->end_time,
-        ];
-        $sessionController = app(EquipmentSessionController::class);
-        $sessionController->storeSessionForReservation($data);
-    }
 }
