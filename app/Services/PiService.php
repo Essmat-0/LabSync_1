@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Controllers\EquipmentSessionController;
 use App\Models\Equipment;
+use App\Models\Grant;
 use App\Models\PublicationLink;
 use App\Models\Reservation;
 use App\Models\Role;
@@ -56,6 +57,10 @@ class PiService
     public function approve(Reservation $reservation, float $cost): bool
     {
         $pi = auth()->user()->piProfile;
+
+        $grant = Grant::where('pi_id', $pi->user_id)->first();
+
+
         if ($cost > $pi->budget_limit) {
             throw new \Exception("Budget exceeded");
         }
@@ -63,7 +68,10 @@ class PiService
         $sessionController = app(EquipmentSessionController::class);
         if ($grantService->checkBalance($cost)) {
             $eqpSession = $sessionController->storeSessionForReservation($reservation);
-            $reservation->update(['status' => 'Approved']);
+            $reservation->update([
+                'status' => 'Approved',
+                'grant_id' => $grant->id,
+            ]);
             $transaction = app(TransactionService::class);
             $transaction->makeNew($eqpSession, $cost);
             return true;

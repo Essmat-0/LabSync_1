@@ -38,4 +38,8 @@ class ResearcherProfile extends Model
     {
         return $this->belongsTo(PiProfile::class, 'pis_id', 'user_id');
     }
+    public function SafetyLog()
+    {
+        return $this->hasMany(SafetyLog::class, 'user_id', 'user_id');
+    }
 }

@@ -17,6 +17,7 @@ class ReservationService
         $reservation = Reservation::create([
             'user_id'      => $data['user_id'],
             'equipment_id' => $data['equipment_id'],
+            'safety_log_id' => $data['safety_log_id'],
             'start_time'   => $data['start_time'],
             'end_time'     => $data['end_time'],
             'quantity'     => $data['quantity'],
@@ -40,5 +41,20 @@ class ReservationService
         $hours = $start->diffInMinutes($end) / 60;
 
         return $hours * $reservation->equipment->hourly_rate;
+    }
+
+    public function convertReservationToSession()
+    {
+        Reservation::where('status', 'approved')
+            ->where('start_time', '<=', now())
+            ->whereDoesntHave('session') // avoid duplicates
+            ->each(function ($reservation) {
+                EquipmentSession::create([
+                    'user_id'      => $reservation->user_id,
+                    'equipment_id' => $reservation->equipment_id,
+                    'start_time'   => $reservation->start_time,
+                    'end_time'     => null,
+                ]);
+            });
     }
 }

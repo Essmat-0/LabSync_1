@@ -5,6 +5,7 @@ use App\Models\Certification;
 use App\Models\EquipmentSession;
 use App\Models\User;
 use App\Services\ConsumableService;
+use App\Services\ReservationService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +32,12 @@ Schedule::call(function () {
 
         User::whereIn('id', $inactiveUserIds)->update(['is_active' => false]);
     }
+
+
+    app(ReservationService::class)->convertReservationToSession();
+    
 })->everyMinute();
+
 
 // check if certificaion is almost expired, then send user an email.
 Schedule::call(function () {

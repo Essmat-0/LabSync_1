@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\NotifyPI;
 use App\Models\Equipment;
+use App\Models\Grant;
+use App\Models\SafetyLog;
 use App\Services\PiService;
 use App\Services\ReservationService;
 use Illuminate\Http\Request;
@@ -29,6 +31,12 @@ class ReservationController extends Controller
 
         $equipment = Equipment::findOrFail($id);
 
+        $safetyLog = SafetyLog::where('user_id', auth()->id())
+            ->where('equipment_category_id', $equipment->category_id)
+            ->where('acknowledgment_status', 1)
+            ->value('id');
+
+
         $validated = $request->validate([
             'start_time' => 'required|date|after:now',
             'end_time'   => 'required|date|after:start_time',
@@ -40,6 +48,7 @@ class ReservationController extends Controller
             'start_time'   => $validated['start_time'],
             'end_time'     => $validated['end_time'],
             'quantity' => $validated['quantity'],
+            'safety_log_id' => $safetyLog,
         ];
 
 

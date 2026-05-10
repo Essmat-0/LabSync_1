@@ -41,4 +41,10 @@ class Reservation extends Model
     {
         return $this->belongsTo(Grant::class);
     }
+
+    public function session()
+    {
+        return $this->hasOne(EquipmentSession::class, 'user_id', 'user_id')
+            ->where('equipment_id', $this->equipment_id);
+    }
 }
