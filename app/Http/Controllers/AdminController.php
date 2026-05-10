@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Equipment;
 use App\Models\User;
 use App\Services\AdminService;
 use Illuminate\Http\Request;
@@ -62,5 +63,25 @@ class AdminController extends Controller
 
         $this->adminService->deleteUser($request->user_id);
         return redirect()->back()->with('successDelete', "Deleted user with ID: {$id}");
+    }
+
+
+    public function dashboard()
+    {
+        $equipmentList = Equipment::where('status', 'Maintenance')->get();
+
+        $impactData = $equipmentList->map(function ($equipment) {
+            $downTimeInHours = $equipment->updated_at->diffInHours(now());
+
+            $impact = $downTimeInHours * $equipment->hourly_rate * config('app.normalization_factor');
+
+            return [
+                'equipment' => $equipment,
+                'downTime'  => $downTimeInHours,
+                'impact'    => $impact
+            ];
+        });
+
+        return view('dashboards.admin', compact('impactData'));
     }
 }

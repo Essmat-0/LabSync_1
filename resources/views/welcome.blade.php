@@ -183,7 +183,7 @@
 
                         {{-- Footer actions --}}
                         <div class="card-footer">
-                            <a href="{{ route('equipment.show', $item->id) }}" class="btn btn-ghost">
+                            <a href="{{ route('equipment.specs', $item->id) }}" class="btn btn-ghost">
                                 View Details
                             </a>
 

@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [EquipmentController::class, 'index'])->name('equipment.index');
     //Dashboards
-    Route::get('/admin/dashboard', fn() => view('dashboards.admin'))->middleware('role:Admin')->name('Admin.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('role:Admin')->name('Admin.dashboard');
     Route::get('/labmanager/dashboard', [LabManagerController::class, 'dashboard'])->middleware('role:Lab_Manager')->name('Lab_Manager.dashboard');
     Route::get('/pi/dashboard', [PiController::class, 'dashboard'])->middleware('role:PI')->name('PI.dashboard');
     Route::get('/auditor/dashboard', [AuditorController::class, 'dashboard'])->name('Auditor.dashboard')->middleware('role:Auditor');
@@ -77,6 +77,8 @@ Route::middleware(['auth', 'role:Researcher'])->group(function () {
 
     Route::post('/equipment/{id}/book', [ReservationController::class, 'store'])->name('equipment.book.store');
     Route::post('/equipment/{equipment}/session/start', [EquipmentSessionController::class, 'storeSessionForStartNow'])->name('equipment.session.start');
+    Route::get('equipment/{equipment}/specs', [EquipmentController::class, 'specs'])->name('equipment.specs');
+
 
     Route::patch('/researcher/dashboard/sessions/{id}/checkout', [EquipmentSessionController::class, 'endSessionForCheckout'])->name('researcher.session.checkout');
 

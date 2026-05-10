@@ -161,6 +161,32 @@
             letter-spacing: 1px;
         }
 
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 0.8rem 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            border-color: var(--blue);
+            color: var(--text);
+            background: rgba(77, 158, 255, 0.05);
+        }
+
+
         .btn-terminate:hover {
             background: var(--red);
             color: #fff;
@@ -191,6 +217,22 @@
 
         .standard-input:focus {
             border-color: var(--accent);
+        }
+
+        .res-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .res-data {
+            font-family: var(--font-mono);
+            flex: 1;
         }
 
         .btn-primary {
@@ -256,6 +298,14 @@
             transition: 0.3s;
         }
 
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .radio-button__input:checked+.radio-button__label .radio-button__custom {
             background-color: var(--accent);
             border-color: transparent;
@@ -280,7 +330,6 @@
 </head>
 
 <body>
-
     <div class="shell">
         <header>
             <div>
@@ -290,128 +339,158 @@
 
             <x-nav-actions />
         </header>
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('tab-provision', this)">01_USER_MANAGMENT</button>
+            <button class="tab-btn" onclick="showTab('tab-showDownTime', this)">02_DOWNTIME_REPORT</button>
+        </div>
+        <div id="tab-provision" class="tab-content active">
+            <section>
+                <h2>Access Termination</h2>
+                @if (session('successDelete'))
+                    <div class="alert">
+                        STATUS_OK: {{ session('successDelete') }}
+                    </div>
+                @endif
+                <form method="POST" action="/adminDeleteUser">
+                    @csrf
+                    @method('DELETE')
+                    <div class="terminal-input-group">
+                        <div class="field-core">
+                            <label for="user_id">Target User UID</label>
+                            <input type="text" id="user_id" name="user_id" placeholder="SYS_USR_00" required>
+                        </div>
+                        <button type="submit" class="btn-terminate">
+                            <span>TERMINATE</span>
+                            <svg width="14" viewBox="0 0 448 512" fill="currentColor">
+                                <path
+                                    d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </section>
 
-        <section>
-            <h2>Access Termination</h2>
-            @if (session('successDelete'))
-                <div class="alert">
-                    STATUS_OK: {{ session('successDelete') }}
+            <section>
+                <h2>Provision User</h2>
+
+                @if (session('success'))
+                    <div class="alert">
+                        STATUS_OK: {{ session('success') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.users.store') }}">
+                    @csrf
+
+                    <div class="radio-button-container">
+                        <div class="radio-button">
+                            <input type="radio" class="radio-button__input" id="radioPI" name="user_role"
+                                value="PI" onchange="toggleFields('PI')" required>
+                            <label class="radio-button__label" for="radioPI">
+                                <span class="radio-button__custom"></span>
+                                PI
+                            </label>
+                        </div>
+                        <div class="radio-button">
+                            <input type="radio" class="radio-button__input" id="radioLabM" name="user_role"
+                                value="Lab_Manager" onchange="toggleFields('LabM')" required>
+                            <label class="radio-button__label" for="radioLabM">
+                                <span class="radio-button__custom"></span>
+                                Lab Manager
+                            </label>
+                        </div>
+                        <div class="radio-button">
+                            <input type="radio" class="radio-button__input" id="radioAuditor" name="user_role"
+                                value="Auditor" onchange="toggleFields('Auditor')" required>
+                            <label class="radio-button__label" for="radioAuditor">
+                                <span class="radio-button__custom"></span>
+                                Auditor
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="full-width">
+                            <label>User Identity</label>
+                            <input type="text" name="user_name" class="standard-input" placeholder="Enter full name"
+                                required>
+                        </div>
+
+                        <div>
+                            <label>Network Email</label>
+                            <input type="email" name="user_email" class="standard-input"
+                                placeholder="email@labsync.sys" required>
+                        </div>
+
+                        <div>
+                            <label>Initial Passcode</label>
+                            <input type="password" name="user_pass" class="standard-input" placeholder="••••••••"
+                                required>
+                        </div>
+                        <div class="full-width">
+                            <label>System Previliges</label>
+                            <input type="text" name="system_priviliges" class="standard-input"
+                                placeholder="superadmin" required>
+                        </div>
+
+                        <div class="full-width">
+                            <label>Authorization Expiry</label>
+                            <input type="date" name="expiry_date" class="standard-input" required>
+                        </div>
+
+                        <div id="pi_fields" style="display:none;" class="full-width">
+                            <label>Budget Allocation ($)</label>
+                            <input type="number" id="budget_input" name="budget_limit" class="standard-input"
+                                placeholder="5000">
+                            <label>Affiliation</label>
+                            <input type="text" id="aff_input" name="affiliation" class="standard-input"
+                                placeholder="Physics Dept">
+                        </div>
+
+                        <div id="labm_fields" style="display:none;" class="full-width">
+                            <label>Assigned Lab Sectors</label>
+                            <input type="text" id="lab_input" name="lab_locations" class="standard-input"
+                                placeholder="Sector A, Sector B">
+                        </div>
+                        <div id="auditor_fields" style="display:none;" class="full-width">
+                            <label>Audit Scope</label>
+                            <input type="text" id="audit_input" name="audit_scope" class="standard-input"
+                                placeholder="m3rfsh">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Initialize Credentials</button>
+                </form>
+            </section>
+        </div>
+
+        <div id="tab-showDownTime" class="tab-content">
+            @forelse ($impactData as $data)
+                <div class="res-item">
+                    <div class="res-data">
+                        <tr>
+                            Equipment Name <td>{{ $data['equipment']->name }}</td> <br>
+                            Down Time <td>{{ number_format($data['downTime'], 2) }} hours</td> <br>
+                            Impact Score<td>${{ number_format($data['impact'], 2) }}</td><br>
+                        </tr>
+                        <br>
+                    </div>
                 </div>
-            @endif
-            <form method="POST" action="/adminDeleteUser">
-                @csrf
-                @method('DELETE')
-                <div class="terminal-input-group">
-                    <div class="field-core">
-                        <label for="user_id">Target User UID</label>
-                        <input type="text" id="user_id" name="user_id" placeholder="SYS_USR_00" required>
-                    </div>
-                    <button type="submit" class="btn-terminate">
-                        <span>TERMINATE</span>
-                        <svg width="14" viewBox="0 0 448 512" fill="currentColor">
-                            <path
-                                d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <section>
-            <h2>Provision User</h2>
-
-            @if (session('success'))
-                <div class="alert">
-                    STATUS_OK: {{ session('success') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('admin.users.store') }}">
-                @csrf
-
-                <div class="radio-button-container">
-                    <div class="radio-button">
-                        <input type="radio" class="radio-button__input" id="radioPI" name="user_role" value="PI"
-                            onchange="toggleFields('PI')" required>
-                        <label class="radio-button__label" for="radioPI">
-                            <span class="radio-button__custom"></span>
-                            PI
-                        </label>
-                    </div>
-                    <div class="radio-button">
-                        <input type="radio" class="radio-button__input" id="radioLabM" name="user_role"
-                            value="Lab_Manager" onchange="toggleFields('LabM')" required>
-                        <label class="radio-button__label" for="radioLabM">
-                            <span class="radio-button__custom"></span>
-                            Lab Manager
-                        </label>
-                    </div>
-                    <div class="radio-button">
-                        <input type="radio" class="radio-button__input" id="radioAuditor" name="user_role"
-                            value="Auditor" onchange="toggleFields('Auditor')" required>
-                        <label class="radio-button__label" for="radioAuditor">
-                            <span class="radio-button__custom"></span>
-                            Auditor
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="full-width">
-                        <label>User Identity</label>
-                        <input type="text" name="user_name" class="standard-input" placeholder="Enter full name"
-                            required>
-                    </div>
-
-                    <div>
-                        <label>Network Email</label>
-                        <input type="email" name="user_email" class="standard-input" placeholder="email@labsync.sys"
-                            required>
-                    </div>
-
-                    <div>
-                        <label>Initial Passcode</label>
-                        <input type="password" name="user_pass" class="standard-input" placeholder="••••••••" required>
-                    </div>
-                    <div class="full-width">
-                        <label>System Previliges</label>
-                        <input type="text" name="system_priviliges" class="standard-input" placeholder="superadmin"
-                            required>
-                    </div>
-
-                    <div class="full-width">
-                        <label>Authorization Expiry</label>
-                        <input type="date" name="expiry_date" class="standard-input" required>
-                    </div>
-
-                    <div id="pi_fields" style="display:none;" class="full-width">
-                        <label>Budget Allocation ($)</label>
-                        <input type="number" id="budget_input" name="budget_limit" class="standard-input"
-                            placeholder="5000">
-                        <label>Affiliation</label>
-                        <input type="text" id="aff_input" name="affiliation" class="standard-input"
-                            placeholder="Physics Dept">
-                    </div>
-
-                    <div id="labm_fields" style="display:none;" class="full-width">
-                        <label>Assigned Lab Sectors</label>
-                        <input type="text" id="lab_input" name="lab_locations" class="standard-input"
-                            placeholder="Sector A, Sector B">
-                    </div>
-                    <div id="auditor_fields" style="display:none;" class="full-width">
-                        <label>Audit Scope</label>
-                        <input type="text" id="audit_input" name="audit_scope" class="standard-input"
-                            placeholder="m3rfsh">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">Initialize Credentials</button>
-            </form>
-        </section>
+            @empty
+                <span> There are no Equipments that has been under maintenance yet. EL7</span>
+            @endforelse
+        </div>
     </div>
 
     <script>
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
         function toggleFields(role) {
             const piDiv = document.getElementById('pi_fields');
             const labDiv = document.getElementById('labm_fields');

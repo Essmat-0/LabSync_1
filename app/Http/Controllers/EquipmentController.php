@@ -25,4 +25,9 @@ class EquipmentController extends Controller
         $equipment = Equipment::findOrFail($id);
         return view('equipment.book', compact('equipment'));
     }
+
+    public function specs(Equipment $equipment)
+    {
+        return view('equipment.specs', compact('equipment'));
+    }
 }
