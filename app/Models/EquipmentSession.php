@@ -31,8 +31,9 @@ class EquipmentSession extends Model
     {
         return $this->belongsTo(Equipment::class);
     }
+
     public function transaction(): HasOne
     {
-        return $this->hasOne(Transaction::class);
+        return $this->hasOne(Transaction::class, 'session_id');
     }
 }

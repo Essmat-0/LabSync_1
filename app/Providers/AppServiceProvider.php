@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
+
             $action = null;
             if ($model->wasRecentlyCreated) $action = 'Created';
             elseif ($model->getOriginal('status') !== $model->status) {
@@ -48,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             AuditTrails::create([
-                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'user_id' => \Illuminate\Support\Facades\Auth::id() ?? 1,
                 'action' => "{$action} " . class_basename($model) . " #{$model->id}",
                 'user_ip' => request()->ip(),
             ]);
@@ -61,15 +62,16 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
+
             \App\Models\AuditTrails::create([
-                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'user_id' => \Illuminate\Support\Facades\Auth::id() ?? 1,
                 'action'  => 'Deleted ' . get_class($model) . ' ID: ' . $model->id,
                 'user_ip' => request()->ip(),
             ]);
         });
         Event::listen(Login::class, function ($event) {
             AuditTrails::create([
-                'user_id' => $event->user->id,
+                'user_id' => $event->user->id ?? 1,
                 'action'  => '(Logged In)',
                 'user_ip' => request()->ip(),
             ]);
@@ -78,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Logout::class, function ($event) {
             if ($event->user) {
                 AuditTrails::create([
-                    'user_id' => $event->user->id,
+                    'user_id' => $event->user->id ?? 1,
                     'action'  => '(Logged Out)',
                     'user_ip' => request()->ip(),
                 ]);

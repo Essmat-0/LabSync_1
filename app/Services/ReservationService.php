@@ -6,6 +6,7 @@ use App\Models\Equipment;
 use App\Models\EquipmentSession;
 use App\Models\Reservation;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log as Log1;
 
 class ReservationService
 {
@@ -45,16 +46,25 @@ class ReservationService
 
     public function convertReservationToSession()
     {
-        Reservation::where('status', 'approved')
+        Reservation::where('status', 'Approved')
             ->where('start_time', '<=', now())
-            ->whereDoesntHave('session') // avoid duplicates
             ->each(function ($reservation) {
-                EquipmentSession::create([
-                    'user_id'      => $reservation->user_id,
-                    'equipment_id' => $reservation->equipment_id,
-                    'start_time'   => $reservation->start_time,
-                    'end_time'     => null,
-                ]);
+
+                $alreadyExists = EquipmentSession::where('user_id', $reservation->user_id)
+                    ->where('equipment_id', $reservation->equipment_id)
+                    ->whereRaw('DATE_FORMAT(start_time, "%Y-%m-%d %H:%i") = ?', [
+                        $reservation->start_time->format('Y-m-d H:i')
+                    ])
+                    ->exists();
+
+                if (!$alreadyExists) {
+                    EquipmentSession::create([
+                        'user_id'      => $reservation->user_id,
+                        'equipment_id' => $reservation->equipment_id,
+                        'start_time'   => $reservation->start_time,
+                        'end_time'     => $reservation->end_time,
+                    ]);
+                }
             });
     }
 }

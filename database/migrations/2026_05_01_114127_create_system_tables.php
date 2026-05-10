@@ -74,6 +74,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->foreignId('pi_id')->nullable()->constrained('pi_profiles', 'user_id')->nullOnDelete();
             $table->decimal('balance', 10, 2)->default(0.00);
+            $table->dateTime('expiry_date');
             $table->timestamps();
         });
 

@@ -19,7 +19,8 @@ class TransactionService
         return Transaction::create([
             'session_id'  => $session->id,
             'user_id'     => $session->user_id,
-            'total_cost'  => $cost,
+            'amount'  => $cost,
+            'normalized_amount' => $cost * config('app.normalization_factor'),
             'is_split'    => false,
         ]);
     }
@@ -59,12 +60,16 @@ class TransactionService
         foreach ($allocations as $allocation) {
             $grant = Grant::findOrFail($allocation['grant_id']);
             $amount = round(($allocation['percentage'] / 100) * $transaction->total_cost, 2);
+            if ($grant->expiry_date < now()) {
+                throw new \Exception("Grant '{$grant->name}' has expired and cannot be used.");
+            }
 
             if ($grant->balance < $amount) {
                 throw new \Exception("Grant '{$grant->name}' has insufficient balance. 
                     Required: {$amount}, Available: {$grant->balance}.");
             }
         }
+
 
         // All checks passed — persist inside a transaction so it's atomic
         DB::transaction(function () use ($transaction, $allocations) {
@@ -82,7 +87,7 @@ class TransactionService
                     'amount'         => $amount,
                 ]);
 
-                // Deduct from grant balance
+
                 $grant->decrement('balance', $amount);
             }
 
@@ -99,12 +104,12 @@ class TransactionService
      */
     public function monthlyGrantSummary(int $grantId, int $month, int $year): array
     {
-        const NORMALIZATION_FACTOR = 13.37;
+
 
         $rows = TransactionGrant::where('grant_id', $grantId)
             ->whereHas('transaction', function ($q) use ($month, $year) {
                 $q->whereMonth('created_at', $month)
-                  ->whereYear('created_at', $year);
+                    ->whereYear('created_at', $year);
             })
             ->with(['transaction.session.equipment', 'grant'])
             ->get();
@@ -114,7 +119,7 @@ class TransactionService
         return [
             'rows'                 => $rows,
             'subtotal'             => $subtotal,
-            'normalized_total'     => round($subtotal * self::NORMALIZATION_FACTOR, 2),
+            'normalized_total'     => round($subtotal * config('app.normalization_factor'), 2),
             'grant_id'             => $grantId,
             'month'                => $month,
             'year'                 => $year,

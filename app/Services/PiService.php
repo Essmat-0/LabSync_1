@@ -58,26 +58,18 @@ class PiService
     {
         $pi = auth()->user()->piProfile;
 
-        $grant = Grant::where('pi_id', $pi->user_id)->first();
-
-
         if ($cost > $pi->budget_limit) {
             throw new \Exception("Budget exceeded");
         }
-        $grantService = app(GrantService::class);
-        $sessionController = app(EquipmentSessionController::class);
-        if ($grantService->checkBalance($cost)) {
-            $eqpSession = $sessionController->storeSessionForReservation($reservation);
-            $reservation->update([
-                'status' => 'Approved',
-                'grant_id' => $grant->id,
-            ]);
-            $transaction = app(TransactionService::class);
-            $transaction->makeNew($eqpSession, $cost);
-            return true;
-        } else {
-            return false;
+
+        $hasValidGrant = $pi->grants()->where('expiry_date', '>', now())->exists();
+
+        if (!$hasValidGrant) {
+            throw new \Exception("No active grants available. All grants have expired.");
         }
+
+        $reservation->update(['status' => 'Approved']);
+        return true;
     }
 
     public function reject(Reservation $reservation): void
@@ -119,7 +111,4 @@ class PiService
 
         return $publicationLink;
     }
-
-
-
 }

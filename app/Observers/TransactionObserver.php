@@ -53,7 +53,7 @@ class TransactionObserver
     protected function log(Transaction $model, $message)
     {
         AuditTrails::create([
-            'user_id' => Auth::id() ?? 0, // 0 for system/automated tasks
+            'user_id' => Auth::id() ?? 1,
             'action'  => "BILLING: " . $message . " (ID: {$model->id})",
             'user_ip' => request()->ip(),
         ]);

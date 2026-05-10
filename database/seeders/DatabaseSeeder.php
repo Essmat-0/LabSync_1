@@ -106,6 +106,7 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
+
         foreach ($users as $user) {
             DB::table('users')->insert(array_merge($user, [
                 'remember_token' => null,
@@ -250,9 +251,9 @@ class DatabaseSeeder extends Seeder
         // 6. GRANTS
         // ----------------------------------------------------------------
         $grants = [
-            ['name' => 'NSF Grant 2024',    'pi_id' => $bobId, 'balance' => 25000.00],
-            ['name' => 'DOE Seed Fund',     'pi_id' => $PIId, 'balance' => 10000.00],
-            ['name' => 'Internal Fund',     'pi_id' => null,   'balance' => 5000.00],
+            ['name' => 'NSF Grant 2024', 'expiry_date' => '2026-10-07',   'pi_id' => $bobId, 'balance' => 25000.00],
+            ['name' => 'DOE Seed Fund',  'expiry_date' => '2026-08-09', 'pi_id' => $PIId, 'balance' => 10000.00],
+            ['name' => 'Internal Fund',  'expiry_date' => '2026-01-01', 'pi_id' => $PIId,   'balance' => 5000.00],
         ];
 
         foreach ($grants as $grant) {

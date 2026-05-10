@@ -460,6 +460,8 @@
             <div class="alert-success">&gt; {{ session('success') }}</div>
         @elseif (session('fail'))
             <div class="alert-error">&gt; {{ session('fail') }}</div>
+        @elseif (session('grant_expired'))
+            <div class="alert-error">&gt; {{ session('grant_expired') }}</div>
         @elseif (session('error'))
             <div class="alert-error">&gt; {{ session('error') }}</div>
         @endif
@@ -617,14 +619,7 @@
             </section>
         </div>
 
-        {{-- ══ TAB 4: Grant Allocation ══
-     Controller must pass:
-       $unallocatedTransactions — Transaction::whereDoesntHave('transactionGrants')
-                                    ->where('user_id', ... pi's researchers ...)
-                                    ->with('session.equipment', 'session.user')
-                                    ->get();
-       $piGrants               — Grant::where('pi_id', auth()->user()->piProfile->user_id)->get();
---}}
+        {{-- ══ TAB 4: Grant Allocation ═ --}}
         <div id="grants-sec" class="tab-content">
             <section>
                 <h2>Grant Allocation</h2>

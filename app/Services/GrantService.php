@@ -8,17 +8,22 @@ use App\Models\Reservation;
 
 class GrantService
 {
-    public function checkBalance(float $cost): bool
-    {
+    // public function checkGrant(float $cost): bool
+    // {
 
-        $grant = auth()->user()->piProfile->grants()->first();
+    //     $grant = auth()->user()->piProfile->grants()->first();
 
-        if ($grant && $cost > $grant->balance) {
-            return false;
-        }
-        $newBalance = $grant->balance - $cost;
-        $grant->update(['balance' => $newBalance]);
-        
-        return true;
-    }
+    //     if ($grant->expiry_date < now()) {
+    //         session()->put('grant_expired', 'Grant Is Expired');
+    //         return false;
+    //     }else {
+    //         if ($grant && $cost > $grant->balance) {
+    //             return false;
+    //         }
+    //         $newBalance = $grant->balance - $cost;
+    //         $grant->update(['balance' => $newBalance]);
+
+    //         return true;
+    //     }
+    // }
 }
