@@ -63,9 +63,13 @@
                     <span class="tab-count">{{ $activeSessions->count() }}</span>
                 @endif
             </button>
+            <button class="tab-btn" onclick="showTab('endedSessions-sec', this)">
+                03_Ended_Sessions
+            </button>
+
         </div>
 
-        
+
         <div id="reservations-sec" class="tab-content active">
             <section>
                 <h2>My Reservations</h2>
@@ -102,7 +106,7 @@
             </section>
         </div>
 
-       
+
 
         <div id="sessions-sec" class="tab-content">
             <section>
@@ -127,10 +131,10 @@
                         </div>
 
                         {{--
-                            CHECKOUT — PATCH /researcher/sessions/{session}/checkout
-                            Controller sets end_time = now(), equipment status back to Idle.
-                            Billing is calculated separately after end_time is stored.
-                        --}}
+                    CHECKOUT — PATCH /researcher/sessions/{session}/checkout
+                    Controller sets end_time = now(), equipment status back to Idle.
+                    Billing is calculated separately after end_time is stored.
+                    --}}
                         <form method="POST" action="{{ route('researcher.session.checkout', $session->id) }}">
                             @csrf @method('PATCH')
                             <button type="submit" class="btn-checkout">Check Out</button>
@@ -142,6 +146,34 @@
                 @endforelse
 
             </section>
+        </div>
+
+        <div id="endedSessions-sec" class="tab-content">
+            <h2> Ended Sessions </h2>
+
+            @forelse ($sessionCost as $sc)
+                <div class="res-item">
+                    <div class="res-data">
+                        <p class="res-label">
+                            Session ID #{{ optional($sc->equipmentSession)->id ?? 'Unknown' }}
+                        </p>
+                        <p class="res-sub">
+                            From:
+                            <span>{{ \Carbon\Carbon::parse($sc->start_time)->format('d M Y, H:i') }}</span>
+                            &rarr;
+                            <span>{{ \Carbon\Carbon::parse($sc->end_time)->format('d M Y, H:i') }}</span>
+                            <br>
+                            Submitted: <span>{{ $sc->created_at->diffForHumans() }}</span>
+                        </p>
+                    </div>
+
+                    <span class="status-pill" style="font-size: 2rem">
+                        {{ ucfirst($sc->normalized_amount) }}$
+                    </span>
+                </div>
+            @empty
+                <div class="empty-state">// NO_ENDED_SESSIONS — no equipment have been used</div>
+            @endforelse
         </div>
 
     </div>{{-- /shell --}}
