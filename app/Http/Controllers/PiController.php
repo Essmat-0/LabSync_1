@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Services\PiService;
 use App\Services\ReservationService;
 use App\Services\TransactionService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PiController extends Controller
@@ -57,11 +59,12 @@ class PiController extends Controller
 
         $unallocatedTransactions = Transaction::whereDoesntHave('transactionGrants')
             ->whereHas('equipmentSession', fn($q) => $q->whereIn('user_id', $researcherIds))
-            ->with(['equipmentSession.equipment', 'equipmentSession.user'])
+            ->with([
+                'equipmentSession' => fn($q) => $q->with(['equipment', 'user'])
+            ])
             ->get();
 
         $piGrants = Grant::where('pi_id', $pi->user_id)->get();
-
         return view('dashboards.pi', compact(
             'pendingReservations',
             'usedEquipments',
@@ -128,5 +131,47 @@ class PiController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function generateInvoice(Request $request)
+    {
+        $request->validate([
+            'grant_id' => 'required|exists:grants,id',
+            'month'    => 'required|date_format:Y-m',
+        ]);
+
+        $pi     = auth()->user();
+        $grant  = \App\Models\Grant::findOrFail($request->grant_id);
+
+        [$year, $mon] = explode('-', $request->month);
+
+        // TransactionGrant IS the grant-transaction link
+        $records = \App\Models\TransactionGrant::where('grant_id', $grant->id)
+            ->join('transactions', 'transactions.id', '=', 'transaction_grants.transaction_id')
+            ->whereYear('transactions.created_at', $year)
+            ->whereMonth('transactions.created_at', $mon)
+            ->select('transaction_grants.*')
+            ->with(['transaction.equipmentSession.equipment', 'transaction.user'])
+            ->get();
+
+
+        $subtotal   = $records->sum('amount'); // use TransactionGrant->amount, already split
+        $normFactor = 13.37;
+        $grandTotal = $subtotal * $normFactor;
+        $monthLabel = \Carbon\Carbon::createFromDate($year, $mon, 1)->format('F Y');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pi.invoice', compact(
+            'pi',
+            'grant',
+            'records',
+            'subtotal',
+            'normFactor',
+            'grandTotal',
+            'monthLabel'
+        ))->setPaper('a4', 'portrait');
+
+        $filename = 'invoice_' . preg_replace('/\s+/', '_', $grant->name) . '_' . $request->month . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

@@ -14,6 +14,7 @@ class Transaction extends Model // AKA BillingRecord Class
         'user_id',
         'amount',
         'normalized_amount',
+        'is_split',
     ];
 
 

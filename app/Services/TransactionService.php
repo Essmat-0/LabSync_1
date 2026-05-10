@@ -46,20 +46,11 @@ class TransactionService
             throw new \Exception("Duplicate grants are not allowed in a single allocation.");
         }
 
-        // Hard constraint: all grants must belong to the PI of this session's researcher
-        $piId = $transaction->session->user->researcherProfile->pi_id;
-        $validGrantIds = Grant::where('pi_id', $piId)->pluck('id')->toArray();
-
-        foreach ($grantIds as $grantId) {
-            if (!in_array($grantId, $validGrantIds)) {
-                throw new \Exception("Grant #{$grantId} does not belong to this researcher's PI.");
-            }
-        }
 
         // Hard constraint: each grant must have enough balance
         foreach ($allocations as $allocation) {
             $grant = Grant::findOrFail($allocation['grant_id']);
-            $amount = round(($allocation['percentage'] / 100) * $transaction->total_cost, 2);
+            $amount = round(($allocation['percentage'] / 100) * $transaction->amount, 2);
             if ($grant->expiry_date < now()) {
                 throw new \Exception("Grant '{$grant->name}' has expired and cannot be used.");
             }
@@ -77,7 +68,7 @@ class TransactionService
             TransactionGrant::where('transaction_id', $transaction->id)->delete();
 
             foreach ($allocations as $allocation) {
-                $amount = round(($allocation['percentage'] / 100) * $transaction->total_cost, 2);
+                $amount = round(($allocation['percentage'] / 100) * $transaction->amount, 2);
                 $grant  = Grant::findOrFail($allocation['grant_id']);
 
                 TransactionGrant::create([

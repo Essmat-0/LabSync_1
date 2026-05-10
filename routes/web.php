@@ -54,6 +54,8 @@ Route::middleware(['auth', 'role:PI'])->group(function () {
     Route::patch('/pi/reservations/{reservation}/reject', [PiController::class, 'reject'])->name('pi.reservation.reject');
     Route::post('/pi/publications', [PiController::class, 'storePublication'])->name('pi.publication.store');
     Route::post('/pi/transactions/{transaction}/allocate', [PiController::class, 'allocateTransaction'])->name('pi.transaction.allocate');
+    Route::post('pi/invoice/generate', [PiController::class, 'generateInvoice'])
+        ->name('pi.invoice.generate');
 });
 
 //==========================================

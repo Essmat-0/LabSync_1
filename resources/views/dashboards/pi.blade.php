@@ -34,24 +34,13 @@
             min-height: 100vh;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
         .shell {
-            position: relative;
-            z-index: 1;
             max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* ── Utility Bar ── */
+        /* Utility Bar */
         .utility-bar {
             display: flex;
             justify-content: space-between;
@@ -63,16 +52,12 @@
             font-family: var(--font-mono);
         }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-
         .stat-label {
             font-size: 0.6rem;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: block;
         }
 
         .stat-value {
@@ -81,7 +66,7 @@
             font-weight: 500;
         }
 
-        /* ── Header ── */
+        /* Header */
         header {
             border-bottom: 1px solid var(--border);
             padding-bottom: 2rem;
@@ -111,11 +96,12 @@
             font-weight: 400;
         }
 
-        /* ── Tabs ── */
+        /* Tabs */
         .tab-nav {
             display: flex;
             gap: 10px;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -147,8 +133,6 @@
             font-weight: 700;
             padding: .1rem .35rem;
             margin-left: .5rem;
-            vertical-align: middle;
-            line-height: 1;
         }
 
         .tab-content {
@@ -157,22 +141,9 @@
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.3s ease-out;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ── Section Card ── */
+        /* Section Card */
         section {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -197,7 +168,7 @@
             flex-shrink: 0;
         }
 
-        /* ── Form ── */
+        /* Form */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -246,7 +217,7 @@
             filter: brightness(1.1);
         }
 
-        /* ── Reservation Items ── */
+        /* Reservation Items */
         .res-item {
             background: var(--bg);
             border: 1px solid var(--border);
@@ -261,7 +232,6 @@
         .res-data {
             font-family: var(--font-mono);
             flex: 1;
-            min-width: 0;
         }
 
         .res-label {
@@ -288,10 +258,6 @@
             flex-shrink: 0;
         }
 
-        .res-actions form {
-            margin: 0;
-        }
-
         .action-btn {
             background: transparent;
             border: 1px solid var(--border);
@@ -314,22 +280,13 @@
             color: var(--red);
         }
 
-        /* ── Publication Items ── */
+        /* Publication Items */
         .pub-item {
             background: var(--bg);
             border: 1px solid var(--border);
             padding: 1.25rem 1.5rem;
             margin-bottom: 1rem;
             font-family: var(--font-mono);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .pub-data {
-            flex: 1;
-            min-width: 0;
         }
 
         .pub-doi {
@@ -337,9 +294,6 @@
             font-weight: 700;
             color: var(--accent);
             margin: 0 0 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .pub-meta {
@@ -353,7 +307,7 @@
             color: var(--text);
         }
 
-        /* ── Alerts & Empty ── */
+        /* Alerts */
         .alert-success {
             background: rgba(77, 158, 255, .1);
             border: 1px solid var(--blue);
@@ -390,6 +344,7 @@
             margin: 2rem 0;
         }
 
+        /* Grant Allocation rows */
         .grant-row {
             display: flex;
             gap: 1rem;
@@ -412,8 +367,6 @@
             border-radius: 3px;
             transition: .15s;
             flex-shrink: 0;
-            margin-bottom: 1px;
-            /* optical alignment with inputs */
         }
 
         .btn-remove-grant:hover {
@@ -428,34 +381,32 @@
 
         @php $budget = auth()->user()->PiProfile->budget_limit; @endphp
 
-        {{-- ── Utility Bar ── --}}
+        {{-- Utility Bar --}}
         <div class="utility-bar">
-            <div class="stat-item">
+            <div>
                 <span class="stat-label">Pending_Reservations</span>
                 <span class="stat-value">{{ $pendingReservations->count() }}</span>
             </div>
-            <div class="stat-item">
+            <div>
                 <span class="stat-label">Publications_Linked</span>
                 <span class="stat-value">{{ $publicationLinks->count() }}</span>
             </div>
-            <div class="stat-item">
+            <div>
                 <span class="stat-label">Budget</span>
                 <span class="stat-value">{{ $budget }}</span>
             </div>
         </div>
 
-        {{-- ── Header ── --}}
+        {{-- Header --}}
         <header>
             <div>
                 <p class="eyebrow">// Research Oversight</p>
                 <h1>PI <span>Dashboard</span></h1>
             </div>
-            <div class="header-nav">
-                <x-nav-actions />
-            </div>
+            <x-nav-actions />
         </header>
 
-        {{-- ── Flash Messages ── --}}
+        {{-- Flash Messages --}}
         @if (session('success'))
             <div class="alert-success">&gt; {{ session('success') }}</div>
         @elseif (session('fail'))
@@ -466,21 +417,23 @@
             <div class="alert-error">&gt; {{ session('error') }}</div>
         @endif
 
-        {{-- ── Tabs ── --}}
+        {{-- Tabs --}}
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="showTab('provision-sec', this)">01_Provisioning</button>
-            <button class="tab-btn" onclick="showTab('pending-sec', this)">
+            <button class="tab-btn active" onclick="showTab('tab-provision', this)">01_Provisioning</button>
+            <button class="tab-btn" onclick="showTab('tab-pending', this)">
                 02_Pending_Reservations
                 @if ($pendingReservations->count() > 0)
                     <span class="tab-count">{{ $pendingReservations->count() }}</span>
                 @endif
             </button>
-            <button class="tab-btn" onclick="showTab('publications-sec', this)">03_Publications</button>
-            <button class="tab-btn" onclick="showTab('grants-sec', this)">04_Grant_Allocation</button>
+            <button class="tab-btn" onclick="showTab('tab-publications', this)">03_Publications</button>
+            <button class="tab-btn" onclick="showTab('tab-grants', this)">04_Grant_Allocation</button>
+            <button class="tab-btn" onclick="showTab('tab-invoice', this)">05_Invoice_Generator</button>
         </div>
 
+
         {{-- ══ TAB 1: Provision Researcher ══ --}}
-        <div id="provision-sec" class="tab-content active">
+        <div id="tab-provision" class="tab-content active">
             <section>
                 <h2>Provision Researcher</h2>
                 <form method="POST" action="{{ route('pi.researcher.store') }}">
@@ -520,20 +473,19 @@
             </section>
         </div>
 
+
         {{-- ══ TAB 2: Pending Reservations ══ --}}
-        <div id="pending-sec" class="tab-content">
+        <div id="tab-pending" class="tab-content">
             <section>
                 <h2>Pending Approvals</h2>
 
                 @forelse ($pendingReservations as $reservation)
                     <div class="res-item">
                         <div class="res-data">
-                            <p class="res-label">
-                                {{ optional($reservation->equipment)->name ?? 'Unknown Equipment' }}
+                            <p class="res-label">{{ optional($reservation->equipment)->name ?? 'Unknown Equipment' }}
                             </p>
                             <p class="res-label">Total Cost:
-                                {{ app('App\Services\ReservationService')->calculateCost($reservation) }}
-                            </p>
+                                {{ app('App\Services\ReservationService')->calculateCost($reservation) }}</p>
                             <p class="res-sub">
                                 Researcher: <span>{{ optional($reservation->user)->name ?? '—' }}</span><br>
                                 From:
@@ -543,7 +495,6 @@
                                 Submitted: <span>{{ $reservation->created_at->diffForHumans() }}</span>
                             </p>
                         </div>
-
                         <div class="res-actions">
                             <form method="POST" action="{{ route('pi.reservation.approve', $reservation->id) }}">
                                 @csrf @method('PATCH')
@@ -555,23 +506,17 @@
                             </form>
                         </div>
                     </div>
-
                 @empty
                     <div class="res-empty">// NO_PENDING_RESERVATIONS — queue is clear</div>
                 @endforelse
-
             </section>
         </div>
 
+
         {{-- ══ TAB 3: Publications ══ --}}
-        <div id="publications-sec" class="tab-content">
+        <div id="tab-publications" class="tab-content">
             <section>
                 <h2>Link Publication</h2>
-
-                @php
-                    $PIid = auth()->id();
-                @endphp
-
                 <form method="POST" action="{{ route('pi.publication.store') }}">
                     @csrf
                     <div class="form-grid">
@@ -593,69 +538,61 @@
                             </select>
                         </div>
                     </div>
-                    <input type="hidden" name="pi_id" value="{{ $PIid }}">
+                    <input type="hidden" name="pi_id" value="{{ auth()->id() }}">
                     <button type="submit" class="btn-submit">Link Publication</button>
                 </form>
 
-                {{-- ── Existing Links ── --}}
                 @if ($publicationLinks->isNotEmpty())
                     <hr class="section-divider">
                     <h2>Linked Publications</h2>
-
                     @foreach ($publicationLinks as $link)
                         <div class="pub-item">
-                            <div class="pub-data">
-                                <p class="pub-doi">{{ $link->doi }}</p>
-                                <p class="pub-meta">
-                                    Equipment: <span>{{ optional($link->equipment)->name ?? '—' }}</span>
-                                    &nbsp;&middot;&nbsp;
-                                    Linked: <span>{{ $link->created_at->format('d M Y') }}</span>
-                                </p>
-                            </div>
+                            <p class="pub-doi">{{ $link->doi }}</p>
+                            <p class="pub-meta">
+                                Equipment: <span>{{ optional($link->equipment)->name ?? '—' }}</span>
+                                &nbsp;&middot;&nbsp;
+                                Linked: <span>{{ $link->created_at->format('d M Y') }}</span>
+                            </p>
                         </div>
                     @endforeach
                 @endif
-
             </section>
         </div>
 
-        {{-- ══ TAB 4: Grant Allocation ═ --}}
-        <div id="grants-sec" class="tab-content">
+
+        {{-- ══ TAB 4: Grant Allocation ══ --}}
+        <div id="tab-grants" class="tab-content">
             <section>
                 <h2>Grant Allocation</h2>
 
                 @forelse ($unallocatedTransactions as $transaction)
-                    <div class="res-item" style="flex-direction: column; align-items: stretch; gap: 1.5rem;">
+                    <div class="res-item" style="flex-direction:column; align-items:stretch; gap:1.5rem;">
 
-                        {{-- ── Transaction Header ── --}}
+                        {{-- Transaction info --}}
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div class="res-data">
                                 <p class="res-label">
-                                    {{ optional($transaction->equipmentSession->equipment)->name ?? '—' }}
+                                    {{ optional(optional($transaction->equipmentSession)->equipment)->name ?? '—' }}
                                 </p>
                                 <p class="res-sub">
                                     Researcher:
-                                    <span>{{ optional($transaction->equipmentSession->user)->name ?? '—' }}</span><br>
+                                    <span>{{ optional(optional($transaction->equipmentSession)->user)->name ?? '—' }}</span><br>
                                     Session ended:
-                                    <span>{{ $transaction->created_at->format('d M Y, H:i') }}</span><br>
-                                    Total Cost: <span>${{ number_format($transaction->total_cost, 2) }}</span>
+                                    <span>{{ $transaction->created_at?->format('d M Y, H:i') ?? '—' }}</span><br>
+                                    Total Cost: <span>${{ number_format($transaction->amount, 2) }}</span>
                                 </p>
                             </div>
-                            <span
-                                style="font-family:var(--font-mono); font-size:.65rem; color:var(--muted); white-space:nowrap;">
+                            <span style="font-family:var(--font-mono); font-size:.65rem; color:var(--muted);">
                                 TXN-{{ str_pad($transaction->id, 5, '0', STR_PAD_LEFT) }}
                             </span>
                         </div>
 
-                        {{-- ── Split Allocation Form ── --}}
-                        <form method="POST" action="{{ route('pi.transaction.allocate', $transaction->id) }}"
-                            class="allocation-form" data-cost="{{ $transaction->total_cost }}">
+                        {{-- Allocation form --}}
+                        <form method="POST" action="{{ route('pi.transaction.allocate', $transaction->id) }}">
                             @csrf
 
-                            {{-- Dynamic grant rows — JS adds/removes these --}}
-                            <div class="grant-rows" id="grant-rows-{{ $transaction->id }}">
-
-                                {{-- Row 1 (always shown) --}}
+                            <div id="grant-rows-{{ $transaction->id }}">
+                                {{-- First row (always visible) --}}
                                 <div class="grant-row">
                                     <div class="form-group" style="flex:2;">
                                         <label>Grant</label>
@@ -675,29 +612,23 @@
                                             class="standard-input pct-input" min="1" max="100"
                                             placeholder="100" required>
                                     </div>
-                                    <div style="padding-top:1.6rem; flex-shrink:0;">
-                                        {{-- placeholder to keep layout aligned on first row --}}
-                                        <span style="display:inline-block; width:2.2rem;"></span>
-                                    </div>
+                                    <span style="display:inline-block; width:2.2rem;"></span>
                                 </div>
-
                             </div>
 
-                            {{-- ── Summary row ── --}}
                             <div
                                 style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
                                 <button type="button" class="action-btn"
-                                    onclick="addGrantRow(this, {{ $transaction->id }}, {{ $transaction->total_cost }})">
+                                    onclick="addGrantRow({{ $transaction->id }})">
                                     + Add Grant
                                 </button>
-
                                 <div style="font-family:var(--font-mono); font-size:.72rem; text-align:right;">
-                                    <span style="color:var(--muted);">Total allocated: </span>
-                                    <span class="pct-total" id="pct-total-{{ $transaction->id }}"
+                                    <span style="color:var(--muted);">Allocated: </span>
+                                    <span id="pct-total-{{ $transaction->id }}"
                                         style="color:var(--accent);">0%</span>
                                     &nbsp;/&nbsp;
                                     <span style="color:var(--muted);">Remaining: </span>
-                                    <span class="pct-remaining" id="pct-remaining-{{ $transaction->id }}"
+                                    <span id="pct-remaining-{{ $transaction->id }}"
                                         style="color:var(--text);">100%</span>
                                 </div>
                             </div>
@@ -711,12 +642,43 @@
                 @empty
                     <div class="res-empty">// NO_PENDING_ALLOCATIONS — all transactions are allocated</div>
                 @endforelse
-
             </section>
         </div>
+
+
+        {{-- ══ TAB 5: Invoice Generator ══ --}}
+        <div id="tab-invoice" class="tab-content">
+            <section>
+                <h2>Invoice Generator</h2>
+
+                <form method="POST" action="{{ route('pi.invoice.generate') }}">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Grant</label>
+                            <select name="grant_id" class="standard-input" required>
+                                <option value="" disabled selected>— Select grant —</option>
+                                @foreach ($piGrants as $grant)
+                                    <option value="{{ $grant->id }}">{{ $grant->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Billing Month</label>
+                            <input type="month" name="month" class="standard-input"
+                                value="{{ now()->format('Y-m') }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">↓ Generate &amp; Download PDF</button>
+                </form>
+            </section>
+        </div>
+
+
     </div>{{-- /shell --}}
 
     <script>
+        // ── Tab switching ──
         function showTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -724,17 +686,27 @@
             btn.classList.add('active');
         }
 
-        const tab = new URLSearchParams(window.location.search).get('tab');
-        if (tab === 'pending') document.querySelectorAll('.tab-btn')[1]?.click();
-        if (tab === 'publications') document.querySelectorAll('.tab-btn')[2]?.click();
-        if (tab === 'grants') document.querySelectorAll('.tab-btn')[3]?.click();
-        // ── Grant row counter per transaction ──
+        // Open tab from URL param e.g. ?tab=pending
+        const tabParam = new URLSearchParams(window.location.search).get('tab');
+        if (tabParam === 'pending') document.querySelectorAll('.tab-btn')[1]?.click();
+        if (tabParam === 'publications') document.querySelectorAll('.tab-btn')[2]?.click();
+        if (tabParam === 'grants') document.querySelectorAll('.tab-btn')[3]?.click();
+        if (tabParam === 'invoice') document.querySelectorAll('.tab-btn')[4]?.click();
+
+        // ── Grant Allocation: add/remove rows + live % counter ──
         const rowCounters = {};
 
-        function addGrantRow(btn, txnId, totalCost) {
+        // Grant options HTML — rendered once by PHP, reused by JS
+        const grantOptions = `
+        <option value="" disabled selected>— Select grant —</option>
+        @foreach ($piGrants as $grant)
+            <option value="{{ $grant->id }}">{{ $grant->name }} (Balance: ${{ number_format($grant->balance, 2) }})</option>
+        @endforeach
+    `;
+
+        function addGrantRow(txnId) {
             if (!rowCounters[txnId]) rowCounters[txnId] = 1;
             const idx = ++rowCounters[txnId];
-
             const container = document.getElementById(`grant-rows-${txnId}`);
 
             const row = document.createElement('div');
@@ -743,22 +715,15 @@
             <div class="form-group" style="flex:2;">
                 <label>Grant</label>
                 <select name="allocations[${idx}][grant_id]" class="standard-input" required>
-                    <option value="" disabled selected>— Select grant —</option>
-                    @foreach ($piGrants as $grant)
-                        <option value="{{ $grant->id }}">
-                            {{ $grant->name }} (Balance: ${{ number_format($grant->balance, 2) }})
-                        </option>
-                    @endforeach
+                    ${grantOptions}
                 </select>
             </div>
             <div class="form-group" style="flex:1;">
                 <label>Percentage (%)</label>
                 <input type="number" name="allocations[${idx}][percentage]"
-                       class="standard-input pct-input"
-                       min="1" max="100" placeholder="0" required>
+                       class="standard-input pct-input" min="1" max="100" placeholder="0" required>
             </div>
-            <button type="button" class="btn-remove-grant"
-                    onclick="removeGrantRow(this, ${txnId})">×</button>
+            <button type="button" class="btn-remove-grant" onclick="removeGrantRow(this, ${txnId})">×</button>
         `;
 
             container.appendChild(row);
@@ -767,42 +732,36 @@
 
         function removeGrantRow(btn, txnId) {
             btn.closest('.grant-row').remove();
-            updatePctSummary(txnId);
+            updatePct(txnId);
         }
 
-        // ── Live percentage summary ──
-        function updatePctSummary(txnId) {
-            const container = document.getElementById(`grant-rows-${txnId}`);
-            const inputs = container.querySelectorAll('.pct-input');
+        function updatePct(txnId) {
+            const inputs = document.getElementById(`grant-rows-${txnId}`).querySelectorAll('.pct-input');
             const total = Array.from(inputs).reduce((sum, el) => sum + (parseFloat(el.value) || 0), 0);
-            const remaining = 100 - total;
+            const rem = 100 - total;
 
             const totalEl = document.getElementById(`pct-total-${txnId}`);
-            const remainingEl = document.getElementById(`pct-remaining-${txnId}`);
+            const remEl = document.getElementById(`pct-remaining-${txnId}`);
 
             totalEl.textContent = total.toFixed(0) + '%';
-            remainingEl.textContent = remaining.toFixed(0) + '%';
+            remEl.textContent = rem.toFixed(0) + '%';
 
-            // Color feedback
             totalEl.style.color = total === 100 ? 'var(--accent)' : total > 100 ? 'var(--red)' : 'var(--muted)';
-            remainingEl.style.color = remaining === 0 ? 'var(--accent)' : remaining < 0 ? 'var(--red)' : 'var(--text)';
+            remEl.style.color = rem === 0 ? 'var(--accent)' : rem < 0 ? 'var(--red)' : 'var(--text)';
         }
 
         function bindPctInputs(txnId) {
-            const container = document.getElementById(`grant-rows-${txnId}`);
-            container.querySelectorAll('.pct-input').forEach(input => {
-                input.removeEventListener('input', input._handler);
-                input._handler = () => updatePctSummary(txnId);
-                input.addEventListener('input', input._handler);
+            document.getElementById(`grant-rows-${txnId}`).querySelectorAll('.pct-input').forEach(input => {
+                input.oninput = () => updatePct(txnId);
             });
         }
 
-        // Init all on page load
+        // Init on load
         document.querySelectorAll('[id^="grant-rows-"]').forEach(container => {
-            const txnId = container.id.replace('grant-rows-', '');
-            bindPctInputs(txnId);
+            bindPctInputs(container.id.replace('grant-rows-', ''));
         });
     </script>
+
 </body>
 
 </html>
