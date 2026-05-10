@@ -42,11 +42,10 @@
                     <span class="tab-count">{{ $maintenanceCount }}</span>
                 @endif
             </button>
+            <button class="tab-btn " onclick="showTab('maintenance-sec', this)">03_Emergency_Maintenance</button>
         </div>
 
-        {{-- ══════════════════════════
-             TAB 1 — Catalog New Asset
-        ══════════════════════════ --}}
+
         <div id="catalog-sec" class="tab-content active">
             <section>
                 <h2>Catalog New Asset</h2>
@@ -115,26 +114,20 @@
             </section>
         </div>
 
-        {{-- ══════════════════════════
-             TAB 2 — Inventory
-             Each card: name, status badge, maintenance warning if needed,
-             + actions: View Details | Set Maintenance | Delete
-        ══════════════════════════ --}}
+
         <div id="inventory-sec" class="tab-content">
             <section>
                 <h2>Equipment Inventory</h2>
 
                 @forelse ($equipments as $equipment)
-                    {{-- Maintenance warning — shown above the card it belongs to --}}
                     @if ($equipment->needsMaintenance())
                         <p class="maintenance-warn">
-                            ⚠ {{ $equipment->name }} has exceeded its calibration threshold and requires maintenance.
+                            {{ $equipment->name }} has exceeded its calibration threshold and requires maintenance.
                         </p>
                     @endif
 
                     <div class="eq-item {{ $equipment->needsMaintenance() ? 'eq-item--warn' : '' }}">
 
-                        {{-- Left: identity --}}
                         <div class="eq-data">
                             <p class="eq-id">EQ-{{ str_pad($equipment->id, 4, '0', STR_PAD_LEFT) }}</p>
                             <p class="eq-name">{{ $equipment->name }}</p>
@@ -145,7 +138,6 @@
                             </p>
                         </div>
 
-                        {{-- Middle: status badge --}}
                         @php
                             $badgeClass = match ($equipment->status) {
                                 'Idle' => 'badge-idle',
@@ -157,13 +149,10 @@
                         @endphp
                         <span class="status-badge {{ $badgeClass }}">{{ $equipment->status }}</span>
 
-                        {{-- Right: actions --}}
                         <div class="eq-actions">
 
-                            {{-- View Details --}}
                             <a href="{{ route('equipment.show', $equipment->id) }}" class="action-btn">Details</a>
 
-                            {{-- Set → Maintenance (only when Idle) --}}
                             @if ($equipment->status === 'Idle')
                                 <form method="POST"
                                     action="{{ route('LabM.equipment.setMaintenance', $equipment->id) }}">
@@ -171,8 +160,14 @@
                                     <button type="submit" class="action-btn action-btn--warn">Maintenance</button>
                                 </form>
                             @endif
+                            @if ($equipment->status === 'Maintenance')
+                                <form method="POST" action="{{ route('LabM.equipment.setIdle', $equipment->id) }}">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="action-btn action-btn--warn">Equipment Is Now
+                                        Idle</button>
+                                </form>
+                            @endif
 
-                            {{-- Delete --}}
                             <form method="POST" action="{{ route('LabM.equipment.destroy', $equipment->id) }}"
                                 onsubmit="return confirm('Permanently decommission {{ addslashes($equipment->name) }}?')">
                                 @csrf @method('DELETE')
@@ -188,12 +183,20 @@
 
             </section>
         </div>
+        <div id="maintenance-sec" class="tab-content">
+            <h2> Emergency Maintenance </h2>
+            <form method="POST" action="{{ route('emergency.maintenance') }}">
+                @csrf
+                <button type="submit" class="action-btn"
+                    style="width:100% ;color:black; background-color:red; font-size:2rem">MAINTENANCE MODE</button>
+            </form>
+        </div>
         <section>
             <h2>Utilization Heatmap</h2>
             <div class="heatmap-container">
                 <div class="heatmap-wrap">
                     <div id="heatmap" class="heatmap-grid">
-                        <!-- JS will render: one label column + 24 fixed cells per row -->
+
                     </div>
                 </div>
 
@@ -205,22 +208,21 @@
                 </div>
             </div>
         </section>
-    </div>{{-- /shell --}}
+    </div>
 
     <script>
         function showTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
         }
 
-        // Auto-open inventory tab if redirected with ?tab=inventory
         if (new URLSearchParams(window.location.search).get('tab') === 'inventory') {
             document.querySelectorAll('.tab-btn')[1]?.click();
         }
 
-        // Fetch utilization data and render the heatmap grid
         (async function renderHeatmap() {
             try {
                 const resp = await fetch('/labmanager/heatmap');
@@ -229,7 +231,6 @@
                 const container = document.getElementById('heatmap');
                 container.innerHTML = '';
 
-                // simplified grid: label column + 24 fixed cells per day (no hour header)
                 data.days.forEach((day, dIdx) => {
                     const label = document.createElement('div');
                     label.className = 'heatmap-label';
@@ -244,7 +245,6 @@
                         const count = (data.counts[dIdx] && data.counts[dIdx][h]) ? data.counts[dIdx][h] :
                             0;
 
-                        // convert percent to a color intensity (use accent color with alpha)
                         const alpha = Math.min(0.95, Math.max(0.03, percent / 100));
                         cell.style.background = `rgba(200,240,74, ${alpha})`;
 

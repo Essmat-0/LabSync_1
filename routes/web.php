@@ -64,7 +64,9 @@ route::middleware(['auth', 'role:Lab_Manager'])->group(function () {
     Route::post('/LabmStoreEquipment', [LabManagerController::class, 'store'])->name('LabM.equipment.store');
     Route::delete('/LabmDeleteEquipment', [LabManagerController::class, 'destroy'])->name('LabM.equipment.destroy');
     Route::patch('/labmanager/equipment/{equipment}/maintenance', [LabMService::class, 'setMaintenance'])->name('LabM.equipment.setMaintenance');
+    Route::patch('/labmanager/equipment/{equipment}/Idle', [LabMService::class, 'setIdle'])->name('LabM.equipment.setIdle');
     Route::get('/labmanager/heatmap', [HeatmapController::class, 'utilization'])->name('LabM.heatmap');
+    Route::post('/labmanager/emergency', [LabManagerController::class, 'emergencyMaintenance'])->name('emergency.maintenance');
 });
 
 //==========================================

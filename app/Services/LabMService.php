@@ -40,4 +40,18 @@ class LabMService
         $equipment->update(['status' => 'Maintenance']);
         return redirect()->route('Lab_Manager.dashboard', ['tab' => 'inventory'])->with('success', '...');
     }
+    public function setIdle(Equipment $equipment)
+    {
+        $equipment->update(['status' => 'Idle']);
+        return redirect()->route('Lab_Manager.dashboard', ['tab' => 'inventory'])->with('success', '...');
+    }
+
+    public function emergencyLockout(): bool
+    {
+        $equipments = Equipment::all();
+        foreach ($equipments as $equipment) {
+            $equipment->update(['status' => 'Maintenance']);
+        }
+        return true;
+    }
 }

@@ -53,4 +53,10 @@ class LabManagerController extends Controller
         $this->labService->deleteEquipment($request->equipment_id);
         return "Deleted Equipment with ID: " . $id;
     }
+
+    public function emergencyMaintenance()
+    {
+        if ($this->labService->emergencyLockout())
+            return redirect()->back()->with('success', "emergency maintenance lockout was succeffully applied for all equipments.");
+    }
 }
