@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Equipment;
+use App\Models\EquipmentSession;
+use App\Models\Reservation;
 
 class LabMService
 {
@@ -22,6 +24,7 @@ class LabMService
             'location_code' => $data['location_code'],
             'total_usage_hours' => Equipment::totalUsageHours(),
             'calibration_threshold' => $data['calibration_threshold'],
+            'maintenance_cost' => $data['maintenance_cost'],
             'cooldown_buffer' => $data['cooldown_buffer'],
             'quantity' => $data['quantity'],
         ];
@@ -48,10 +51,15 @@ class LabMService
 
     public function emergencyLockout(): bool
     {
-        $equipments = Equipment::all();
-        foreach ($equipments as $equipment) {
+        Equipment::all()->each(function ($equipment) {
             $equipment->update(['status' => 'Maintenance']);
-        }
+        });
+        EquipmentSession::whereNull('end_time')->update([
+            'end_time' => now()
+        ]);
+        Reservation::where('status', '!=', 'Cancelled')
+            ->where('start_time', '>', now())
+            ->update(['status' => 'Cancelled']);
         return true;
     }
 }

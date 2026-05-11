@@ -58,4 +58,8 @@ class Equipment extends Model
     {
         return $this->belongsToMany(Consumable::class, 'equipment_consumables', 'equipment_id', 'consumable_id');
     }
+    public function roiReports(): HasMany
+    {
+        return $this->hasMany(RoiReport::class, 'equipment_id', 'id');
+    }
 }

@@ -26,7 +26,6 @@
 
     <div class="shell">
 
-        {{-- Breadcrumb --}}
         <nav class="breadcrumb">
             <a href="{{ route('equipment.index') }}">Equipment</a>
             <span class="sep">/</span>
@@ -35,7 +34,6 @@
             <span>Book</span>
         </nav>
 
-        {{-- Hero --}}
         <div class="hero">
             <div class="hero-tag">EQ-{{ str_pad($equipment->id, 4, '0', STR_PAD_LEFT) }} · Reservation Request</div>
             <h1 class="hero-name">{{ $equipment->name }}</h1>
@@ -46,7 +44,7 @@
             </div>
         </div>
 
-        {{-- ── Blocked: not available ── --}}
+        {{-- 3shan lw el user estns7 w 7awl yd5ol el book bel url bdl el book button (disabled) --}}
         @if (!$canBeBooked)
             <div class="blocked-card">
                 <div class="blocked-title">Equipment Unavailable</div>
@@ -58,7 +56,7 @@
                 <a href="{{ route('equipment.show', $equipment->id) }}" class="btn-back">← Back to Details</a>
             </div>
 
-            {{-- ── Blocked: insufficient clearance ── --}}
+            {{-- 3shan lw el user estns7 w 7awl yd5ol el book bel url bdl el book button (disabled) --}}
         @elseif (!$hasClearance)
             <div class="blocked-card">
                 <div class="blocked-title">Insufficient Clearance</div>
@@ -69,10 +67,7 @@
                 </p>
                 <a href="{{ route('equipment.show', $equipment->id) }}" class="btn-back">← Back to Details</a>
             </div>
-
-            {{-- ── Available: show both options ── --}}
         @else
-            {{-- Validation errors --}}
             @if ($errors->any())
                 <div class="alert-error">
                     <ul>
@@ -102,12 +97,6 @@
                 </button>
             </div>
 
-            {{-- ══════════════════════════
-                 PANEL A — Start Now
-                 Only start_time = now() is stored server-side.
-                 end_time is null until researcher checks out.
-                 Billing: (checkout_time - start_time) × hourly_rate
-            ══════════════════════════ --}}
             @if ($isIdle)
                 <div id="panel-now">
 
@@ -158,11 +147,7 @@
                 </div>
             @endif
 
-            {{-- ══════════════════════════
-            PANEL B — Schedule Reservation
-            Both start_time and end_time are stored.
-            Status = pending until PI approves.
-            ══════════════════════════ --}}
+
             <div id="panel-reserve" style="{{ !$isIdle ? 'display:block;' : 'display:none;' }}">
                 <form method="POST" action="{{ route('equipment.book.store', $equipment->id) }}">
                     @csrf
@@ -188,7 +173,8 @@
                             <div class="field">
                                 <label for="quantity">Quantity</label>
                                 <input type="number" id="quantity" name="quantity" min="1"
-                                    max="{{ ($equipment->quantity - 1 == 0) ? 1 : $equipment->quantity - 1 }}" required />
+                                    max="{{ $equipment->quantity - 1 == 0 ? 1 : $equipment->quantity - 1 }}"
+                                    required />
                             </div>
 
                             {{-- Live cost preview --}}
@@ -224,9 +210,10 @@
 
         @endif
 
-    </div>{{-- /shell --}}
+    </div>
 
     <script>
+        // tab swicth
         function switchMode(mode) {
             const isNow = mode === 'now';
 
@@ -244,6 +231,7 @@
 
         //=====================================
 
+        // live clocjk
         function updateClock() {
             const el = document.getElementById('live-clock');
             if (!el) return;
@@ -262,6 +250,7 @@
 
         //=====================================
 
+        // cost bta3 el reservation 3la asas el choosen time
         const ratePerHour = {{ $equipment->hourly_rate }};
         const startInput = document.getElementById('start_time');
         const endInput = document.getElementById('end_time');
@@ -303,6 +292,9 @@
         @if ($errors->any())
             switchMode('reserve');
         @endif
+        //==========================================================================================
+
+
     </script>
 
 </body>

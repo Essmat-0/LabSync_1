@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Http\Responses\LoginResponse;
 use App\Models\AuditTrails;
+use App\Services\ReservationService;
+use App\Services\TransactionService;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +21,15 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
-    }
 
+        $this->app->singleton(ReservationService::class, function () {
+            return new ReservationService();
+        });
+
+        $this->app->singleton(TransactionService::class, function () {
+            return new TransactionService();
+        });
+    }
     /**
      * Bootstrap any application services.
      */

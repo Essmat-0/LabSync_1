@@ -6,7 +6,6 @@ use App\Models\Equipment;
 use App\Models\EquipmentSession;
 use App\Models\Reservation;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log as Log1;
 
 class ReservationService
 {

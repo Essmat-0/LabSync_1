@@ -125,5 +125,6 @@ return [
 
     'available_hours_per_week' => 168,
     'normalization_factor' => 13.37,
+    'min_roi' => 10,
 
 ];

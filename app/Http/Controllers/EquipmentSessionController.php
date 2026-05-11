@@ -35,7 +35,7 @@ class EquipmentSessionController extends Controller
     //     ]);
     // }
 
-    public function storeSessionForStartNow(Request $request, $id)
+    public function storeSessionForStartNow($id)
     {
         $equipment = Equipment::findOrFail($id);
         $equipmentService = new EquipmentService();
@@ -43,16 +43,16 @@ class EquipmentSessionController extends Controller
         if (!$equipmentService->canEquipmentBeUsed($id)) {
             return back()->withErrors(['message' => 'Equipment is currently cooling down, Please wait.']);
         }
+        $equipment->update([
+            'status' => 'Active',
+            'quantity' => $equipment->quantity - 1,
+        ]);
         EquipmentSession::create([
             'equipment_id' => $equipment->id,
             'user_id' => auth()->id(),
             'start_time' => now(),
         ]);
 
-        $equipment->update([
-            'status' => 'Active',
-            'quantity' => $equipment->quantity - 1,
-        ]);
         return redirect()->route('Researcher.dashboard')->with('success', 'Session started!');
     }
 
@@ -71,9 +71,9 @@ class EquipmentSessionController extends Controller
             'quantity' => $equipment->quantity + 1,
         ]);
 
+
         $durationInHours = $session->start_time->diffInMinutes($session->end_time) / 60;
         $cost = $durationInHours * $session->equipment->hourly_rate;
-        $session->update(['total_cost' => $cost]);
 
         app(TransactionService::class)->makeNew($session, $cost);
         return redirect()->route('Researcher.dashboard')->with('success', 'Session Ended!');

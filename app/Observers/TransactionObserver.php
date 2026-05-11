@@ -14,6 +14,8 @@ class TransactionObserver
     public function created(Transaction $transaction): void
     {
         $this->log($transaction, "New Transaction initiated #{$transaction->id}. Amount: {$transaction->amount} | Normalized Amount: {$transaction->normalized_amount}");
+        
+            
     }
 
     /**

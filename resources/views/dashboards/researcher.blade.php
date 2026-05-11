@@ -6,15 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Researcher Terminal | LabSync</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap"rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/researcher.css') }}">
 </head>
 
 <body>
     <div class="shell">
 
-        {{-- ── Utility Bar ── --}}
         <div class="utility-bar">
             <div class="stat-item">
                 <span class="stat-label">Active_Sessions</span>
@@ -30,7 +29,6 @@
             </div>
         </div>
 
-        {{-- ── Header ── --}}
         <header>
             <div>
                 <p class="eyebrow">// Lab Access</p>
@@ -41,7 +39,6 @@
             </div>
         </header>
 
-        {{-- ── Flash Messages ── --}}
         @if (session('success'))
             <div class="alert-success">&gt; {{ session('success') }}</div>
         @endif
@@ -49,7 +46,6 @@
             <div class="alert-error">&gt; {{ session('error') }}</div>
         @endif
 
-        {{-- ── Tab Nav ── --}}
         <div class="tab-nav">
             <button class="tab-btn active" onclick="showTab('reservations-sec', this)">
                 01_My_Reservations
@@ -77,12 +73,10 @@
                 @forelse ($reservations as $reservation)
                     <div class="res-item">
                         <div class="res-data">
-                            {{-- Equipment name --}}
                             <p class="res-label">
                                 {{ optional($reservation->equipment)->name ?? 'Unknown Equipment' }}
                             </p>
 
-                            {{-- Time window --}}
                             <p class="res-sub">
                                 From:
                                 <span>{{ \Carbon\Carbon::parse($reservation->start_time)->format('d M Y, H:i') }}</span>
@@ -93,7 +87,6 @@
                             </p>
                         </div>
 
-                        {{-- Status pill (pending / approved / rejected) --}}
                         <span class="status-pill {{ $reservation->status }}">
                             {{ ucfirst($reservation->status) }}
                         </span>
@@ -113,6 +106,11 @@
                 <h2>Active Sessions</h2>
 
                 @forelse ($activeSessions as $session)
+                    @php
+                        $start = \Carbon\Carbon::parse($session->start_time);
+                        $hours = $start->diffInMinutes(now()) / 60;
+                        $cost = $hours * $session->equipment->hourly_rate;
+                    @endphp
                     <div class="session-item">
                         <div class="res-data">
                             <p class="res-label">
@@ -120,21 +118,17 @@
                                 {{ optional($session->equipment)->name ?? 'Unknown Equipment' }}
                             </p>
 
-                            {{-- Only start_time exists; end_time is null until checkout --}}
                             <p class="res-sub">
                                 Started:
-                                <span>{{ \Carbon\Carbon::parse($session->start_time)->format('d M Y, H:i') }}</span>
+                                <span>{{ $start->format('d M Y, H:i') }}</span>
                                 <br>
                                 Duration so far:
-                                <span>{{ \Carbon\Carbon::parse($session->start_time)->diffForHumans(now(), true) }}</span>
+                                <span>{{ $start->diffForHumans(now(), true) }}</span><br>
+                                Cost so far:
+                                <span>{{ number_format($cost, 2) }}</span>
+
                             </p>
                         </div>
-
-                        {{--
-                    CHECKOUT — PATCH /researcher/sessions/{session}/checkout
-                    Controller sets end_time = now(), equipment status back to Idle.
-                    Billing is calculated separately after end_time is stored.
-                    --}}
                         <form method="POST" action="{{ route('researcher.session.checkout', $session->id) }}">
                             @csrf @method('PATCH')
                             <button type="submit" class="btn-checkout">Check Out</button>
@@ -159,9 +153,9 @@
                         </p>
                         <p class="res-sub">
                             From:
-                            <span>{{ \Carbon\Carbon::parse($sc->start_time)->format('d M Y, H:i') }}</span>
+                            <span>{{ \Carbon\Carbon::parse($sc->equipmentSession->start_time)->format('d M Y, H:i') }}</span>
                             &rarr;
-                            <span>{{ \Carbon\Carbon::parse($sc->end_time)->format('d M Y, H:i') }}</span>
+                            <span>{{ \Carbon\Carbon::parse($sc->equipmentSession->end_time)->format('d M Y, H:i') }}</span>
                             <br>
                             Submitted: <span>{{ $sc->created_at->diffForHumans() }}</span>
                         </p>
@@ -176,7 +170,7 @@
             @endforelse
         </div>
 
-    </div>{{-- /shell --}}
+    </div>
 
     <script>
         function showTab(tabId, btn) {
@@ -186,15 +180,25 @@
             btn.classList.add('active');
         }
 
-        // Auto-open sessions tab if redirected with ?tab=sessions
+        // yft7 session tab lw redirected with ?tab=sessions
         if (new URLSearchParams(window.location.search).get('tab') === 'sessions') {
             document.querySelectorAll('.tab-btn')[1]?.click();
         }
 
-        // 5 minutes auto - reload to ensure user is Active
-        setTimeout(function() {
-            location.reload();
-        }, 300000);
+
+        // auto ping to update user activity
+
+        function sendHeartbeat() {
+            fetch('{{ route('heartbeat') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                }
+            });
+        }
+        sendHeartbeat();
+        setInterval(sendHeartbeat, 240000);
     </script>
 
 </body>

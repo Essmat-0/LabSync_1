@@ -42,7 +42,8 @@
                     <span class="tab-count">{{ $maintenanceCount }}</span>
                 @endif
             </button>
-            <button class="tab-btn " onclick="showTab('maintenance-sec', this)">03_Emergency_Maintenance</button>
+            <button class="tab-btn " onclick="showTab('roi-sec', this)">03_ROI_REVIEW</button>
+            <button class="tab-btn " onclick="showTab('maintenance-sec', this)">04_Emergency_Maintenance</button>
         </div>
 
 
@@ -96,6 +97,11 @@
                             <label>Calibration Threshold (Hrs)</label>
                             <input type="number" step="0.1" name="calibration_threshold" class="standard-input"
                                 placeholder="500" value="{{ old('calibration_threshold') }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Maintenance Cost ($)</label>
+                            <input type="number" step="0.01" name="maintenance_cost" class="standard-input"
+                                placeholder="500" value="{{ old('maintenance_cost') }}" required>
                         </div>
                         <div class="form-group">
                             <label>Cooldown Buffer (Min)</label>
@@ -183,13 +189,53 @@
 
             </section>
         </div>
+        <div id="roi-sec" class="tab-content active">
+            <section>
+                <h2>ROI Review</h2>
+
+                @forelse ($equipments as $eq)
+                    @php
+                        $roi =
+                            $eq->maintenance_cost > 0
+                                ? ($eq->total_usage_hours / $eq->maintenance_cost) * config('app.normalization_factor')
+                                : 0;
+
+                        $roiColor = $roi >= 1 ? 'var(--accent)' : 'var(--red)';
+                    @endphp
+
+                    <div class="roi-item">
+                        <div class="roi-data">
+                            <p class="roi-name">{{ $eq->name }}</p>
+                            <p class="roi-meta">
+                                Total Usage: <span>{{ number_format($eq->total_usage_hours, 1) }} hrs</span>
+                                &nbsp;&middot;&nbsp;
+                                Maintenance Cost: <span>${{ number_format($eq->maintenance_cost, 2) }}</span>
+                            </p>
+                        </div>
+
+                        <div class="roi-score">
+                            <span class="roi-label">ROI Index</span>
+                            <span class="roi-value" style="color: {{ $roiColor }};">
+                                {{ number_format($roi, 2) }}
+                            </span>
+                        </div>
+                    </div>
+
+                @empty
+                    <div class="res-empty">// NO_EQUIPMENT_DATA — nothing to review</div>
+                @endforelse
+
+            </section>
+        </div>
         <div id="maintenance-sec" class="tab-content">
-            <h2> Emergency Maintenance </h2>
-            <form method="POST" action="{{ route('emergency.maintenance') }}">
-                @csrf
-                <button type="submit" class="action-btn"
-                    style="width:100% ;color:black; background-color:red; font-size:2rem">MAINTENANCE MODE</button>
-            </form>
+            <section>
+                <h2> Emergency Maintenance </h2>
+                <form method="POST" action="{{ route('emergency.maintenance') }}">
+                    @csrf
+                    <button type="submit" class="action-btn"
+                        style="width:100% ;color:black; background-color:red; font-size:2rem">MAINTENANCE MODE</button>
+                </form>
+            </section>
         </div>
         <section>
             <h2>Utilization Heatmap</h2>

@@ -342,6 +342,7 @@
         <div class="tab-nav">
             <button class="tab-btn active" onclick="showTab('tab-provision', this)">01_USER_MANAGMENT</button>
             <button class="tab-btn" onclick="showTab('tab-showDownTime', this)">02_DOWNTIME_REPORT</button>
+            <button class="tab-btn" onclick="showTab('tab-roiReport', this)">03_ROI_REPORT</button>
         </div>
         <div id="tab-provision" class="tab-content active">
             <section>
@@ -482,7 +483,41 @@
             @endforelse
         </div>
     </div>
-
+    <div id="tab-roiReport" class="tab-content">
+        @php
+            $min_threshold = config('app.min_roi');
+        @endphp
+        <section>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Equipment Name</th>
+                        <th>Current ROI</th>
+                        <th>Min ROI (Threshold)</th>
+                        <th>Recommendation</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($roiReport as $report)
+                        <tr>
+                            <td>{{ $report->equipment->name }}</td>
+                            <td>{{ number_format($report->roi_score, 2) }}</td>
+                            <td>{{ $min_threshold }}</td>
+                            <td>{{ $report->recommendation }}</td>
+                            <td>
+                                @if ($report->roi_score < $min_threshold)
+                                    <span class="badge bg-danger">Alert: Procurement Suggested</span>
+                                @else
+                                    <span class="badge bg-success">Healthy</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </section>
+    </div>
     <script>
         function showTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));

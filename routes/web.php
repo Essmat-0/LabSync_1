@@ -111,3 +111,8 @@ Route::middleware(['auth', 'role:Researcher'])->group(function () {
 });
 
 //==========================================
+// Ping For Heartbeat,,,, checks if user is active -> ping the user to update activity
+Route::middleware('auth')->post('/heartbeat', function () {
+    auth()->user()->touch();
+    return response()->json(['status' => 'ok']);
+})->name('heartbeat');

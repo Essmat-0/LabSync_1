@@ -188,7 +188,7 @@
                             </a>
 
                             @auth
-                                @if ($availableItem)
+                                @if ($availableItem && $isResearcher)
                                     @if ($currentCert)
                                         @if ($currentCert->expiry_date >= now())
                                             <a href="{{ route('equipment.book', $item->id) }}" class="btn btn-primary">

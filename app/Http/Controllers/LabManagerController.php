@@ -20,6 +20,7 @@ class LabManagerController extends Controller
     public function dashboard()
     {
         $equipments = Equipment::all();
+
         return view('dashboards.labmanager', compact('equipments'));
     }
 
@@ -33,6 +34,7 @@ class LabManagerController extends Controller
             'category_id' => 'required|integer',
             'location_code' => 'required|string',
             'calibration_threshold' => 'required|numeric',
+            'maintenance_cost' => 'required|numeric',
             'cooldown_buffer' => 'required|integer',
             'quantity' =>   'required|integer',
         ];

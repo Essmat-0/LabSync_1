@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Equipment;
+use App\Models\RoiReport;
 use App\Models\User;
 use App\Services\AdminService;
 use Illuminate\Http\Request;
@@ -70,6 +71,8 @@ class AdminController extends Controller
     {
         $equipmentList = Equipment::where('status', 'Maintenance')->get();
 
+        $roiReport = RoiReport::with('equipment')->get();
+
         $impactData = $equipmentList->map(function ($equipment) {
             $downTimeInHours = $equipment->updated_at->diffInHours(now());
 
@@ -82,6 +85,6 @@ class AdminController extends Controller
             ];
         });
 
-        return view('dashboards.admin', compact('impactData'));
+        return view('dashboards.admin', compact('impactData', 'roiReport'));
     }
 }

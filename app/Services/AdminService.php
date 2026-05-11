@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\RoiReport;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -69,4 +70,5 @@ class AdminService
     {
         return  User::where('id', $id)->firstOrFail()->delete();
     }
+
 }

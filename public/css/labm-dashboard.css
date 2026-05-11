@@ -488,3 +488,67 @@ h2::before {
     font-family: var(--font-mono);
     font-size: 0.8rem;
 }
+
+/* Roi Tab */
+.roi-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.roi-data {
+    font-family: var(--font-mono);
+    flex: 1;
+    min-width: 0;
+}
+
+.roi-name {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 6px 0;
+}
+
+.roi-meta {
+    font-size: .68rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.roi-meta span {
+    color: var(--text);
+}
+
+.roi-score {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+    gap: 2px;
+}
+
+.roi-label {
+    font-size: .58rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.roi-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.roi-hint {
+    font-size: .6rem;
+    color: var(--muted);
+}

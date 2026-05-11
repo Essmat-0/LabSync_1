@@ -89,10 +89,9 @@ class TransactionService
         });
     }
 
-    /**
-     * Monthly invoice aggregation for FR 7.2.
-     * Returns all transactions linked to a grant, with the normalization factor applied.
-     */
+    
+    //Returns all transactions linked to a grant, with the normalization factor applied.
+    
     public function monthlyGrantSummary(int $grantId, int $month, int $year): array
     {
 
